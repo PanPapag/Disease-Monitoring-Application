@@ -19,11 +19,11 @@
       list_node_ptr tail_;
       size_t size_;
       size_t data_size_;
-      int (*cmp_func_)(void*, void*);
-      void (*print_func_)(FILE*, void*);
+      int (*list_cmp_func_)(void*, void*);
+      void (*list_print_func_)(FILE*, void*);
   } list_t;
 
-  /* Creates a new list given a type, compare and print function */
+  /* Creates a new list given a type, compare and print functions */
   #define list_create(t, dc, dp) __list_create(sizeof(t), dc, dp)
   list_ptr __list_create(size_t, int (*)(void*, void*), void (*)(FILE*, void*));
 
@@ -48,12 +48,11 @@
   list_node_ptr list_front(list_ptr);
   /* Access the last element */
   list_node_ptr list_back(list_ptr);
+
   /* Find the element equals a given one */
   list_node_ptr list_find(list_ptr, void*);
-
   /* Returns the size of the list */
   size_t list_size(list_ptr);
-
   /* Prints the list from the beginning to the end */
   void list_print(list_ptr, FILE* out);
   /* Prints the list from the end to the beginning */

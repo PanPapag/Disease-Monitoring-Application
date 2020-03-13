@@ -6,16 +6,16 @@
 #include "../includes/list.h"
 
 list_ptr __list_create(size_t data_size,
-                   int (*cmp_func)(void*, void*),
-                   void (*print_func)(FILE*, void*)) {
+                       int (*list_cmp_func)(void*, void*),
+                       void (*list_print_func)(FILE*, void*)) {
 
   list_ptr list = malloc(sizeof(*list));
   list->head_ = NULL;
   list->tail_ = NULL;
   list->size_ = 0U;
   list->data_size_ = data_size;
-  list->cmp_func_ = cmp_func;
-  list->print_func_ = print_func;
+  list->list_cmp_func_ = list_cmp_func;
+  list->list_print_func_ = list_print_func;
   return list;
 }
 
@@ -43,7 +43,7 @@ void list_remove(list_ptr* list, list_node_ptr list_node) {
     (*list)->tail_ = list_node->prev_;
   /* Change prev only if node to be deleted is NOT the first node */
   if (list_node->prev_ != NULL)
-      list_node->prev_->next_ = list_node->next_;
+    list_node->prev_->next_ = list_node->next_;
   /* Change next only if node to be deleted is NOT the last node */
   if (list_node->next_ != NULL)
     list_node->next_->prev_ = list_node->prev_;
@@ -117,19 +117,19 @@ void list_sorted_insert(list_ptr* list, void *new_data) {
     (*list)->tail_ = new_node;
   } else {
     /* Check to insert at the beggining of the list */
-    if ((*list)->cmp_func_(new_node->data_, (*list)->head_->data_) < 0) {
+    if ((*list)->list_cmp_func_(new_node->data_, (*list)->head_->data_) < 0) {
       new_node->next_ = (*list)->head_;
       new_node->next_->prev_ = new_node;
       (*list)->head_ = new_node;
     /* Check to inser at the end of the list */
-    } else if ((*list)->cmp_func_(new_node->data_, (*list)->tail_->data_) > 0) {
+    } else if ((*list)->list_cmp_func_(new_node->data_, (*list)->tail_->data_) > 0) {
       new_node->prev_ = (*list)->tail_ ;
       (*list)->tail_->next_ = new_node;
       (*list)->tail_ = new_node;
     } else {
       current = (*list)->head_;
       /* Find position to be inserted */
-      while (current->next_ != NULL && (*list)->cmp_func_(new_node->data_, current->next_->data_) > 0) {
+      while (current->next_ != NULL && (*list)->list_cmp_func_(new_node->data_, current->next_->data_) > 0) {
         current = current->next_;
       }
       new_node->next_ = current->next_;
@@ -193,7 +193,7 @@ list_node_ptr list_back(list_ptr list) {
 list_node_ptr list_find(list_ptr list, void* data) {
   list_node_ptr temp = list->head_;
   while (temp != NULL) {
-    if (list->cmp_func_(temp->data_, data) == 0 ) {
+    if (list->list_cmp_func_(temp->data_, data) == 0 ) {
       return temp;
     } else {
       temp = temp->next_;
@@ -209,7 +209,7 @@ size_t list_size(list_ptr list) {
 void list_print(list_ptr list, FILE* out) {
   list_node_ptr temp = list->head_;
   while (temp != NULL) {
-    list->print_func_(out, temp->data_);
+    list->list_print_func_(out, temp->data_);
     temp = temp->next_;
   }
 }
@@ -217,7 +217,7 @@ void list_print(list_ptr list, FILE* out) {
 void list_print_reverse(list_ptr list, FILE* out) {
   list_node_ptr temp = list->tail_;
   while (temp != NULL) {
-    list->print_func_(out, temp->data_);
+    list->list_print_func_(out, temp->data_);
     temp = temp->prev_;
   }
 }
