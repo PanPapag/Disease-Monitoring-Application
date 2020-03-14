@@ -1,6 +1,8 @@
 #include <stdio.h>
 
 #include "../includes/list.h"
+#include "../includes/avl.h"
+
 
 int cmp(void *a, void *b) {
 	int v = *((int *) a);
@@ -13,6 +15,9 @@ void print(FILE *out, void *v) {
 }
 
 int main(void) {
+
+	/* ----------------------------- LIST TESTING ----------------------------- */
+
 
   int temp;
 	// Give it the type that it will hold, how to compare data and
@@ -83,7 +88,31 @@ int main(void) {
 
 	list_clear(l);
 
+	/* ----------------------------- AVL TESTING ----------------------------- */
+	avl_ptr avl = avl_create(int, cmp, print);
 
+	temp = 10;
+	avl_insert(&avl, &temp);
+	temp = 30;
+	avl_insert(&avl, &temp);
+	temp = 4;
+	avl_insert(&avl, &temp);
+	temp = 20;
+	avl_insert(&avl, &temp);
+	temp = 7;
+	avl_insert(&avl, &temp);
+	printf("----------PRINT AVL --------\n");
+	avl_print_inorder(avl, stdout);
+	temp = 8;
+	avl_node_ptr res_avl = avl_find(avl, &temp);
+	if (res_avl == NULL)
+		printf("NULL CORRECT!\n");
+
+	temp = 10;
+	res_avl = avl_find(avl, &temp);
+	printf("FOUND: %d -> 10 correct\n",*((int *)res_avl->data_));
+
+	avl_clear(avl);
 
   return 0;
 }

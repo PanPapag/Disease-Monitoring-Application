@@ -27,9 +27,9 @@
   #define list_create(t, dc, dp) __list_create(sizeof(t), dc, dp)
   list_ptr __list_create(size_t, int (*)(void*, void*), void (*)(FILE*, void*));
 
-  /* Delete list */
+  /* Deletes list */
   void list_clear(list_ptr);
-  /* Delete a given node */
+  /* Deletes a given node */
   void list_remove(list_ptr*, list_node_ptr);
 
   /* Adds an element to the beginning */
@@ -54,8 +54,8 @@
   /* Returns the size of the list */
   size_t list_size(list_ptr);
   /* Prints the list from the beginning to the end */
-  void list_print(list_ptr, FILE* out);
+  void list_print(list_ptr, FILE*);
   /* Prints the list from the end to the beginning */
-  void list_print_reverse(list_ptr, FILE* out);
+  void list_print_reverse(list_ptr, FILE*);
 
 #endif

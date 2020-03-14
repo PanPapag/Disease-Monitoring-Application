@@ -121,7 +121,7 @@ void list_sorted_insert(list_ptr* list, void *new_data) {
       new_node->next_ = (*list)->head_;
       new_node->next_->prev_ = new_node;
       (*list)->head_ = new_node;
-    /* Check to inser at the end of the list */
+    /* Check to insert at the end of the list */
     } else if ((*list)->list_cmp_func_(new_node->data_, (*list)->tail_->data_) > 0) {
       new_node->prev_ = (*list)->tail_ ;
       (*list)->tail_->next_ = new_node;
