@@ -18,7 +18,6 @@ int main(void) {
 
 	/* ----------------------------- LIST TESTING ----------------------------- */
 
-
   int temp;
 	// Give it the type that it will hold, how to compare data and
 	// how to print data.
@@ -113,6 +112,9 @@ int main(void) {
 	printf("FOUND: %d -> 10 correct\n",*((int *)res_avl->data_));
 
 	avl_clear(avl);
+
+	/* ----------------------------- HT TESTING ----------------------------- */
+
 
   return 0;
 }
