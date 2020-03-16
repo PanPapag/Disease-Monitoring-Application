@@ -1,11 +1,11 @@
 #ifndef __UTILS__
   #define __UTILS__
 
+  #include <stdint.h>
+
   #define MAX(x, y) ((x) < (y) ? (y) : (x))
 
-  #define BUFFER_SIZE 64
-
-  #include <stdint.h>
+  #define BUFFER_SIZE 255
 
   typedef struct program_parameters {
     char* patient_records_filename;
