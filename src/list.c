@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +56,7 @@ void list_push_front(list_ptr* list, void* new_data) {
   /* Allocate node and initialize node */
   // + data_size means that the size of the variable-length
   // array 'data_' of the node will be of size data_size.
-  list_node_ptr new_node = (list_ptr) malloc(sizeof(list_node_t) + (*list)->data_size_);
+  list_node_ptr new_node = (list_node_ptr) malloc(sizeof(list_node_t) + (*list)->data_size_);
   memcpy(new_node->data_, new_data, (*list)->data_size_);
   /* Since we are adding at the begining, prev is always NULL */
   new_node->prev_ = NULL;

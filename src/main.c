@@ -2,7 +2,7 @@
 
 #include "../includes/list.h"
 #include "../includes/avl.h"
-
+#include "../includes/hash_table.h"
 
 int cmp(void *a, void *b) {
 	int v = *((int *) a);
@@ -86,7 +86,6 @@ int main(void) {
 	free(back);
 
 	list_clear(l);
-
 	/* ----------------------------- AVL TESTING ----------------------------- */
 	avl_ptr avl = avl_create(int, cmp, print);
 
@@ -114,7 +113,31 @@ int main(void) {
 	avl_clear(avl);
 
 	/* ----------------------------- HT TESTING ----------------------------- */
+	/*
+	printf("------------------------------------------------------------\n");
+	list_ptr la = list_create(int*, cmp, print);
+	int *skata = malloc(10 * sizeof(int));
+	printf("SKATA SIZE: %d\n",sizeof(skata));
+	printf("LETS SEE WHAT WE STORE\n");
+	for (int i = 0; i < 10; ++i) {
+		skata[i] = i;
+		printf("%d\n",skata[i]);
+	}
+	printf("ADDRESS OUT: %p\n", &skata);
+	list_push_front(&la, &skata);
+	list_node_ptr list_node = list_pop_front(&la);
+	int *gamw = *((int *) list_node->data_);
+	printf("ADDRESS OUT AGAIN: %p\n", &list_node->data_);
+	printf("LETS SEE WHAT WE GET\n");
+	for (int i = 0; i < 10; ++i) {
+		printf("%d\n",gamw[i]);
+	}
+	printf("------------------------------------------------------------\n");
+	*/
 
+	hash_table_ptr ht = hash_table_create(char*, int, 10, 20, NULL, cmp, print, print);
+
+	hash_table_clear(ht);
 
   return 0;
 }
