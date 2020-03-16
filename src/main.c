@@ -114,24 +114,29 @@ int main(void) {
 
 	/* ----------------------------- HT TESTING ----------------------------- */
 	/*
+	typedef struct test {
+		int odd;
+		int even;
+	} test_t;
 	printf("------------------------------------------------------------\n");
-	list_ptr la = list_create(int*, cmp, print);
-	int *skata = malloc(10 * sizeof(int));
+	list_ptr la = list_create(test_t*, cmp, print);
+	test_t* skata = (test_t *) calloc(1, sizeof(*skata));
 	printf("SKATA SIZE: %d\n",sizeof(skata));
 	printf("LETS SEE WHAT WE STORE\n");
-	for (int i = 0; i < 10; ++i) {
-		skata[i] = i;
-		printf("%d\n",skata[i]);
-	}
-	printf("ADDRESS OUT: %p\n", &skata);
+	skata->odd = 11;
+	skata->even = 10;
+	printf("ODD %d\n",skata->odd);
+	printf("EEVEN %d\n",skata->even);
+
+
+	printf("ADDRESS OUT: %p - VALUE OUT: %p\n", skata, *skata);
 	list_push_front(&la, &skata);
 	list_node_ptr list_node = list_pop_front(&la);
-	int *gamw = *((int *) list_node->data_);
-	printf("ADDRESS OUT AGAIN: %p\n", &list_node->data_);
+	test_t* gamw = *((test_t **) list_node->data_);
+	printf("ADDRESS OUT AGAIN: %p - VALUE OUT AGAIN: %p\n", gamw, *gamw);
 	printf("LETS SEE WHAT WE GET\n");
-	for (int i = 0; i < 10; ++i) {
-		printf("%d\n",gamw[i]);
-	}
+	printf("ODD %d\n",gamw->odd);
+	printf("EEVEN %d\n",gamw->even);
 	printf("------------------------------------------------------------\n");
 	*/
 

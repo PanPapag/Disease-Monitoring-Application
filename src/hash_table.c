@@ -53,11 +53,12 @@ hash_table_ptr __hash_table_create(size_t key_size, size_t value_size,
 
 void hash_table_clear(hash_table_ptr hash_table) {
   for (size_t i = 0U; i != hash_table->ht_entries_; ++i) {
-    for (size_t j = 0U; j != list_size(hash_table->table_[i]); ++j) {
+    size_t no_buckets = list_size(hash_table->table_[i]);
+    for (size_t j = 0U; j != no_buckets; ++j) {
       list_node_ptr list_node = list_pop_front(&hash_table->table_[i]);
-      bucket_ptr bucket = *((bucket_ptr) list_node->data_); //TODO FIX IT
-      printf("ENTRIES OUT: %d\n",bucket->bucket_entries_); 
-      //__bucket_clear(bucket);
+      bucket_ptr bucket = *((bucket_ptr*) list_node->data_);
+      __bucket_clear(bucket);
+      free(list_node);
     }
     list_clear(hash_table->table_[i]);
   }
