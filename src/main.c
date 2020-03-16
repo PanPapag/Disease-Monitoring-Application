@@ -1,148 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-#include "../includes/list.h"
 #include "../includes/avl.h"
 #include "../includes/hash_table.h"
+#include "../includes/utils.h"
 
-int cmp(void *a, void *b) {
-	int v = *((int *) a);
-	int w = *((int *) b);
-	return v - w;
-}
+program_parameters_t parameters;
 
-void print(FILE *out, void *v) {
-	fprintf(out, "%d\n", *((int *)v));
-}
-
-int main(void) {
-
-	/* ----------------------------- LIST TESTING ----------------------------- */
-
-  int temp;
-	// Give it the type that it will hold, how to compare data and
-	// how to print data.
-	list_ptr l = list_create(int, cmp, print);
-	// Do a bunch of random insertions.
-	temp = 5;
-	list_sorted_insert(&l, &temp);
-	temp = 3;
-	list_sorted_insert(&l, &temp);
-	temp = 7;
-	list_sorted_insert(&l, &temp);
-	temp = 10;
-	list_sorted_insert(&l, &temp);
-	temp = 100;
-	list_push_back(&l, &temp);
-	temp = 200;
-	list_push_front(&l, &temp);
-	//Print the thing
-	printf("----------PRINT--------\n");
-	list_print(l, stdout);
-	printf("----------PRINT REVERSE --------\n");
-	list_print_reverse(l, stdout);
-
-	size_t res = list_size(l);
-
-	printf("SIZE: %d\n",res);
-
-	temp = 10;
-	list_node_ptr ka = list_find(l, &temp);
-	printf("FIND -> 10: %d\n", *((int *)ka->data_));
-
-	list_node_ptr f = list_front(l);
-	printf("FRONT: %d\n", *((int *)f->data_));
-	list_node_ptr b = list_back(l);
-	printf("BACK: %d\n", *((int *)b->data_));
-
-
-	list_remove(&l, f);
-
-	printf("----------PRINT--------\n");
-	list_print(l, stdout);
-
-	temp = 333;
-	list_push_front(&l, &temp);
-
-	printf("----------PRINT--------\n");
-	list_print(l, stdout);
-
-	list_remove(&l, b);
-
-	temp = 666;
-	list_push_back(&l, &temp);
-
-	printf("----------PRINT--------\n");
-	list_print(l, stdout);
-
-	list_node_ptr back = list_pop_back(&l);
-	printf("----------PRINT--------\n");
-	list_print(l, stdout);
-
-	list_node_ptr front = list_pop_front(&l);
-	printf("----------PRINT--------\n");
-	list_print(l, stdout);
-
-	free(front);
-	free(back);
-
-	list_clear(l);
-	/* ----------------------------- AVL TESTING ----------------------------- */
-	avl_ptr avl = avl_create(int, cmp, print);
-
-	temp = 10;
-	avl_insert(&avl, &temp);
-	temp = 30;
-	avl_insert(&avl, &temp);
-	temp = 4;
-	avl_insert(&avl, &temp);
-	temp = 20;
-	avl_insert(&avl, &temp);
-	temp = 7;
-	avl_insert(&avl, &temp);
-	printf("----------PRINT AVL --------\n");
-	avl_print_inorder(avl, stdout);
-	temp = 8;
-	avl_node_ptr res_avl = avl_find(avl, &temp);
-	if (res_avl == NULL)
-		printf("NULL CORRECT!\n");
-
-	temp = 10;
-	res_avl = avl_find(avl, &temp);
-	printf("FOUND: %d -> 10 correct\n",*((int *)res_avl->data_));
-
-	avl_clear(avl);
-
-	/* ----------------------------- HT TESTING ----------------------------- */
-	/*
-	typedef struct test {
-		int odd;
-		int even;
-	} test_t;
-	printf("------------------------------------------------------------\n");
-	list_ptr la = list_create(test_t*, cmp, print);
-	test_t* skata = (test_t *) calloc(1, sizeof(*skata));
-	printf("SKATA SIZE: %d\n",sizeof(skata));
-	printf("LETS SEE WHAT WE STORE\n");
-	skata->odd = 11;
-	skata->even = 10;
-	printf("ODD %d\n",skata->odd);
-	printf("EEVEN %d\n",skata->even);
-
-
-	printf("ADDRESS OUT: %p - VALUE OUT: %p\n", skata, *skata);
-	list_push_front(&la, &skata);
-	list_node_ptr list_node = list_pop_front(&la);
-	test_t* gamw = *((test_t **) list_node->data_);
-	printf("ADDRESS OUT AGAIN: %p - VALUE OUT AGAIN: %p\n", gamw, *gamw);
-	printf("LETS SEE WHAT WE GET\n");
-	printf("ODD %d\n",gamw->odd);
-	printf("EEVEN %d\n",gamw->even);
-	printf("------------------------------------------------------------\n");
-	*/
-
-	hash_table_ptr ht = hash_table_create(char*, int, 10, 20, NULL, cmp, print, print);
-
-	hash_table_clear(ht);
-
-  return 0;
+int main(int* argc, char* argv[]) {
+  srandom((unsigned int) ((time(NULL) ^ (intptr_t) printf) & (intptr_t) main));
+  parse_arguments(argc, argv);
+  printf("%s\n",parameters.patient_records_filename);
+  return EXIT_SUCCESS;
 }

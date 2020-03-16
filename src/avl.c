@@ -170,12 +170,10 @@ void avl_insert(avl_ptr* avl, void* new_data) {
   while (current != NULL) {
     int cmp_res = (*avl)->avl_cmp_func_(new_node->data_, (*avl)->root_->data_);
     parent = current;
-    if (cmp_res < 0) {
+    if (cmp_res <= 0) {
       current = current->left_;
-    } else if (cmp_res > 0) {
-      current = current->right_;
     } else {
-      return;
+      current = current->right_;
     }
   }
   /* Update the members of the new avl node */

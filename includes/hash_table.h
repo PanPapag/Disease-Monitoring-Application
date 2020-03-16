@@ -45,6 +45,6 @@
   void hash_table_clear(hash_table_ptr);
 
   /* Adds an element to the avl tree */
-  //void hash_table_insert(avl_ptr*, void*);
+  void hash_table_insert(void*, void*);
 
 #endif
