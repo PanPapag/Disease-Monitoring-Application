@@ -1,9 +1,11 @@
+#include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
+#include "../includes/macros.h"
 #include "../includes/patient_record.h"
 #include "../includes/utils.h"
 
@@ -23,6 +25,7 @@ void patient_record_print(FILE* out, void* v) {
   } else {
     fprintf(out, "Exit Date: %s\n", exit_date_buffer);
   }
+  printf("\n");
 }
 
 int patient_record_compare(void* a, void* b) {
@@ -37,4 +40,15 @@ int patient_record_compare(void* a, void* b) {
   string_to_int64(pr1_entry_date_buffer, (int64_t *) &pr1_entry_date_to_secs);
   string_to_int64(pr2_entry_date_buffer, (int64_t *) &pr2_entry_date_to_secs);
 	return pr1_entry_date_to_secs - pr2_entry_date_to_secs;
+}
+
+void patient_record_delete(void* v) {
+  patient_record_ptr patient_record = *((patient_record_ptr *) v);
+  if (patient_record != NULL) {
+    __FREE(patient_record->record_id);
+    __FREE(patient_record->disease_id);
+    __FREE(patient_record->patient_first_name);
+    __FREE(patient_record->patient_last_name);
+    __FREE(patient_record);
+  }
 }

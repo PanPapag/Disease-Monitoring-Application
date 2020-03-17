@@ -20,5 +20,7 @@
   void patient_record_print(FILE*, void*);
   /* Utility function to compare two patient record structs */
   int patient_record_compare(void*, void*);
+  /* Utility function to delete an allocated patient record struct */
+  void patient_record_delete(void*);
 
 #endif

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../includes/avl.h"
+#include "../includes/macros.h"
 #include "../includes/utils.h"
 
 avl_ptr __avl_create(size_t data_size,

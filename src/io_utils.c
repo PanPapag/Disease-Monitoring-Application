@@ -80,20 +80,20 @@ void parse_arguments(int* argc, char* argv[]) {
 }
 
 static void __report(const char* tag, const char* fmt, va_list args) {
-    fprintf(stderr, "%s", tag);
-    vfprintf(stderr, fmt, args);
-    fputc('\n', stderr);
-    va_end(args);
+  fprintf(stderr, "%s", tag);
+  vfprintf(stderr, fmt, args);
+  fputc('\n', stderr);
+  va_end(args);
 }
 
 void report_error(const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    __report("[ERROR]: ", fmt, args);
+  va_list args;
+  va_start(args, fmt);
+  __report("[ERROR]: ", fmt, args);
 }
 
 void report_warning(const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    __report("[WARNING]: ", fmt, args);
+  va_list args;
+  va_start(args, fmt);
+  __report("[WARNING]: ", fmt, args);
 }

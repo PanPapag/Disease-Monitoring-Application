@@ -6,7 +6,8 @@
 
 list_ptr __list_create(size_t data_size,
                        int (*list_cmp_func)(void*, void*),
-                       void (*list_print_func)(FILE*, void*)) {
+                       void (*list_print_func)(FILE*, void*),
+                       void (*list_data_delete_func)(void*)) {
 
   list_ptr list = malloc(sizeof(*list));
   list->head_ = NULL;
@@ -15,6 +16,7 @@ list_ptr __list_create(size_t data_size,
   list->data_size_ = data_size;
   list->list_cmp_func_ = list_cmp_func;
   list->list_print_func_ = list_print_func;
+  list->list_data_delete_func_ = list_data_delete_func;
   return list;
 }
 
@@ -23,6 +25,7 @@ void list_clear(list_ptr list) {
   list_node_ptr next;
   while (current != NULL) {
     next = current->next_;
+    list->list_data_delete_func_(current->data_);
     free(current);
     current = next;
   }

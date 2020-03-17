@@ -44,7 +44,7 @@ hash_table_ptr __hash_table_create(size_t key_size, size_t value_size,
   hash_table->ht_key_print_func_ = key_print_func;
   hash_table->ht_value_print_func_ = value_print_func;
   for (size_t i = 0U; i != ht_entries; ++i) {
-    hash_table->table_[i] = list_create(bucket_ptr, cmp_func, value_print_func);
+    hash_table->table_[i] = list_create(bucket_ptr, cmp_func, value_print_func, NULL);
     bucket_ptr bucket = __bucket_create(entries_per_bucket_node_, key_size, value_size);
     list_push_front(&hash_table->table_[i], &bucket);
   }
