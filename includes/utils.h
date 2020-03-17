@@ -23,4 +23,9 @@
   /* Prints a given string */
   void print_string(void*);
 
+  /* Tokenizes a string given a delimiter and returns the tokens to an array */
+  void tokenize_string(char*, char[], char**);
+  /* Returns the number of tokens of a string given its delimiter */
+  size_t count_tokens(char*, char[]);
+
 #endif

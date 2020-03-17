@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,4 +52,95 @@ void patient_record_delete(void* v) {
     __FREE(patient_record->patient_last_name);
     __FREE(patient_record);
   }
+}
+
+int validate_patient_record_tokens(char** patient_record_tokens) {
+  /* record_id: Only letters and numbers */
+  char* record_id = patient_record_tokens[0];
+  for (size_t i = 0; i < strlen(record_id); ++i) {
+    if (!isalnum(record_id[i]))
+      return INVALID_RECORD_ID;
+  }
+  /* patient_first_name: Only letters */
+  char* patient_first_name = patient_record_tokens[1];
+  for (size_t i = 0; i < strlen(patient_first_name); ++i) {
+    if (!isalpha(patient_first_name[i]))
+      return INVALID_PATIENT_FIRST_NAME;
+  }
+  /* patient_first_name: Only letters */
+  char* patient_last_name = patient_record_tokens[2];
+  for (size_t i = 0; i < strlen(patient_last_name); ++i) {
+    if (!isalpha(patient_last_name[i]))
+      return INVALID_PATIENT_LAST_NAME;
+  }
+  /* disease_id: Only letters, numbers and maybe character '-' */
+  char* disease_id = patient_record_tokens[3];
+  for (size_t i = 0; i < strlen(disease_id); ++i) {
+    if (!isalnum(disease_id[i]) && disease_id[i] != '-')
+      return INVALID_DISEASE_ID;
+  }
+  /* country: Only letters */
+  char* country = patient_record_tokens[4];
+  for (size_t i = 0; i < strlen(country); ++i) {
+    if (!isalpha(country[i]))
+      return INVALID_COUNTRY;
+  }
+  /* entry_date: DD-MM-YYYY format */
+  char* entry_date = patient_record_tokens[5];
+  if (strlen(entry_date) == 10) {
+    for (size_t i = 0; i < strlen(entry_date); ++i) {
+      if (i == 2 || i == 5) {
+        if (entry_date[i] != '-')
+          return INVALID_ENTRY_DATE;
+      } else {
+        if (!isdigit(entry_date[i]))
+          return INVALID_ENTRY_DATE;
+      }
+    }
+  } else {
+    return INVALID_ENTRY_DATE;
+  }
+  /* exit_date: DD-MM-YYYY format or - (not specified) */
+  char* exit_date = patient_record_tokens[6];
+  if (strlen(exit_date) == 1) {
+    if (exit_date[0] != '-')
+      return INVALID_EXIT_DATE;
+  }
+  else if (strlen(exit_date) == 10) {
+    for (size_t i = 0; i < strlen(exit_date); ++i) {
+      if (i == 2 || i == 5) {
+        if (exit_date[i] != '-')
+          return INVALID_EXIT_DATE;
+      } else {
+        if (!isdigit(exit_date[i]))
+          return INVALID_EXIT_DATE;
+      }
+    }
+    /* Check if exit date is earlier than the entry date */
+    // Convert entry_date string to struct tm
+    struct tm entry_date_tm;
+    memset(&entry_date_tm, 0, sizeof(struct tm));
+    strptime(entry_date, "%d-%m-%Y", &entry_date_tm);
+    // Convert exit_date string to struct tm
+    struct tm exit_date_tm;
+    memset(&exit_date_tm, 0, sizeof(struct tm));
+    strptime(exit_date, "%d-%m-%Y", &exit_date_tm);
+    // Convert entry_date_tm back to seconds
+    char entry_date_buf[11];
+    strftime(entry_date_buf, sizeof(entry_date_buf), "%s", &entry_date_tm);
+    size_t entry_date_to_secs;
+    string_to_int64(entry_date_buf, (int64_t *) &entry_date_to_secs);
+    // Convert entry_date_tm back to seconds
+    char exit_date_buf[11];
+    strftime(exit_date_buf, sizeof(exit_date_buf), "%s", &exit_date_tm);
+    size_t exit_date_to_secs;
+    string_to_int64(exit_date_buf, (int64_t *) &exit_date_to_secs);
+    // Check if exit date is valid
+    if (exit_date_to_secs < entry_date_to_secs)
+      return INVALID_EXIT_DATE;
+  } else {
+    return INVALID_EXIT_DATE;
+  }
+  /* Everything fine return success */
+  return VALID_PATIENT_RECORD;
 }

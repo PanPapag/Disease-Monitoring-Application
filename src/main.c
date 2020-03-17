@@ -11,20 +11,19 @@
 
 program_parameters_t parameters;
 
-int main(int* argc, char* argv[]) {
+extern hash_table_ptr patient_record_ht;
+
+int main(int argc, char* argv[]) {
   srandom((unsigned int) ((time(NULL) ^ (intptr_t) printf) & (intptr_t) main));
   parse_arguments(argc, argv);
   /* Define number of buckets as the max size of disease and country hash table */
   size_t no_buckets = MAX(parameters.ht_disease_size, parameters.ht_country_size);
   /* patient_record_ht: record id --> pointer to patient record structure */
-  hash_table_ptr patient_record_ht = hash_table_create(STRING,
-                                                       patient_record_ptr,
-                                                       no_buckets,
-                                                       parameters.bucket_size,
-                                                       hash_string,
-                                                       patient_record_compare,
-                                                       print_string,
-                                                       patient_record_print);
+  patient_record_ht = hash_table_create(STRING, patient_record_ptr,
+                                        no_buckets, parameters.bucket_size,
+                                        hash_string, patient_record_compare,
+                                        print_string, patient_record_print);
+  read_patient_records_file_and_update_structures();
   /* Create Disease Hash Table */ /*
   hash_table_ptr disease_ht = hash_table_create(char*, avl_ptr,
                                                 parameters.ht_disease_size,

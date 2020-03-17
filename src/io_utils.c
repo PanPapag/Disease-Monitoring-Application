@@ -5,10 +5,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../includes/hash_table.h"
+#include "../includes/macros.h"
 #include "../includes/io_utils.h"
+#include "../includes/patient_record.h"
 #include "../includes/utils.h"
 
 program_parameters_t parameters;
+
+hash_table_ptr patient_record_ht;
 
 static struct option options[] = {
       {"p",    required_argument, NULL, 'p'},
@@ -77,6 +82,34 @@ void parse_arguments(int* argc, char* argv[]) {
         abort();
     }
   }
+}
+
+void read_patient_records_file_and_update_structures() {
+  int line_counter = 0;
+  char buffer[BUFFER_SIZE], copy_buffer[BUFFER_SIZE];
+  char *patient_record_tokens[NO_PATIENT_RECORD_TOKENS];
+  /* Open file for read only - handles binary fille too */
+  FILE* fp = fopen(parameters.patient_records_filename, "rb+");
+  /* Read file line by line */
+  while (fgets(buffer, sizeof(buffer), fp) != NULL) {
+    /* Discard '\n' that fgets() stores */
+    buffer[strlen(buffer) - 1] = '\0';
+    /* Copy line to another buffer in order to be tokenized independently */
+    memset(copy_buffer, 0, sizeof(copy_buffer));
+    strcpy(copy_buffer, buffer);
+    /* Count tokens to check if patient record is valid */
+    if (count_tokens(copy_buffer, PATIENT_RECORD_DELIMITER) != NO_PATIENT_RECORD_TOKENS) {
+      report_error("Invalid number of arguments in patient record <%s>. "
+                   "Discarding patient record.", buffer);
+    }
+    /* Store each token of the line into an array */
+    tokenize_string(buffer, PATIENT_RECORD_DELIMITER, patient_record_tokens);
+    /* Check patient record tokens' validity */
+    int code = validate_patient_record_tokens(patient_record_tokens);
+    printf(" %d\n",code);
+  }
+  /* Close file pointer */
+  fclose(fp);
 }
 
 static void __report(const char* tag, const char* fmt, va_list args) {
