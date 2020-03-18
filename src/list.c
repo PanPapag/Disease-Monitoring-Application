@@ -192,6 +192,19 @@ list_node_ptr list_back(list_ptr list) {
   return list->tail_;
 }
 
+list_node_ptr list_get(list_ptr list, int index) {
+  list_node_ptr temp = list->head_;
+  while (temp != NULL) {
+    if (index-- == 1) {
+      return temp;
+    }
+    else {
+      temp = temp->next_;
+    }
+  }
+  return NULL;
+}
+
 list_node_ptr list_find(list_ptr list, void* data) {
   list_node_ptr temp = list->head_;
   while (temp != NULL) {
@@ -201,6 +214,7 @@ list_node_ptr list_find(list_ptr list, void* data) {
       temp = temp->next_;
     }
   }
+  // Return NULL if index is out of bounds
   return NULL;
 }
 

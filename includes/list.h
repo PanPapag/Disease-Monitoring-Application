@@ -50,6 +50,8 @@
   list_node_ptr list_front(list_ptr);
   /* Access the last element */
   list_node_ptr list_back(list_ptr);
+  /* Access the n-th element */
+  list_node_ptr list_get(list_ptr, int);
 
   /* Find the element equals a given one */
   list_node_ptr list_find(list_ptr, void*);

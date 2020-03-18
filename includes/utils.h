@@ -22,6 +22,8 @@
 
   /* Prints a given string */
   void print_string(void*);
+  /* Compares two given strings */
+  int compare_string(void*, void*);
 
   /* Tokenizes a string given a delimiter and returns the tokens to an array */
   void tokenize_string(char*, char[], char**);

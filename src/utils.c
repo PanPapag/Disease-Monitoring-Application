@@ -33,6 +33,12 @@ void print_string(void* v) {
   printf("%s\n",s);
 }
 
+int compare_string(void* v, void* w) {
+  char* str1 = *((char *) v);
+  char* str2 = *((char *) w);
+  return !strcmp(str1, str2);
+}
+
 void tokenize_string(char* value, char delimiter[], char **res) {
   int i = 0;
   char* token = strtok(value, " ");

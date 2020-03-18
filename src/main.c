@@ -21,7 +21,8 @@ int main(int argc, char* argv[]) {
   /* patient_record_ht: record id --> pointer to patient record structure */
   patient_record_ht = hash_table_create(STRING, patient_record_ptr,
                                         no_buckets, parameters.bucket_size,
-                                        hash_string, patient_record_compare,
+                                        hash_string,
+                                        compare_string, patient_record_compare,
                                         print_string, patient_record_print);
   read_patient_records_file_and_update_structures();
   /* Create Disease Hash Table */ /*
@@ -89,5 +90,6 @@ int main(int argc, char* argv[]) {
   list_clear(l);
   */
   hash_table_clear(patient_record_ht);
+
   return EXIT_SUCCESS;
 }
