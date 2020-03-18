@@ -23,12 +23,18 @@
     char* patient_first_name;
     char* patient_last_name;
     char* disease_id;
+    char* country;
     struct tm entry_date;
     struct tm exit_date;
   } patient_record_t;
 
   typedef patient_record_t* patient_record_ptr;
 
+  /*
+    Utility function to create a new patient record struct given
+    patient record tokens
+  */
+  patient_record_ptr patient_record_create(char**);
   /* Utility function to print a patient record struct */
   void patient_record_print(FILE*, void*);
   /* Utility function to compare two patient record structs */

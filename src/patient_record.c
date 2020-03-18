@@ -10,6 +10,34 @@
 #include "../includes/patient_record.h"
 #include "../includes/utils.h"
 
+patient_record_ptr patient_record_create(char** patient_record_tokens) {
+  /* Allocate memory for patient_record_ptr */
+  patient_record_ptr patient_record = (patient_record_ptr) malloc(sizeof(*patient_record));
+  /* Allocate memory and store record_id */
+  patient_record->record_id = (char*) malloc((strlen(patient_record_tokens[0]) + 1) * sizeof(char));
+  strcpy(patient_record->record_id, patient_record_tokens[0]);
+  /* Allocate memory and store patient_first_name */
+  patient_record->patient_first_name = (char*) malloc((strlen(patient_record_tokens[1]) + 1) * sizeof(char));
+  strcpy(patient_record->patient_first_name, patient_record_tokens[1]);
+  /* Allocate memory and store patient_last_name */
+  patient_record->patient_last_name = (char*) malloc((strlen(patient_record_tokens[2]) + 1) * sizeof(char));
+  strcpy(patient_record->patient_last_name, patient_record_tokens[2]);
+  /* Allocate memory and store disease_id */
+  patient_record->disease_id = (char*) malloc((strlen(patient_record_tokens[3]) + 1) * sizeof(char));
+  strcpy(patient_record->disease_id, patient_record_tokens[3]);
+  /* Allocate memory and store country */
+  patient_record->country = (char*) malloc((strlen(patient_record_tokens[4]) + 1) * sizeof(char));
+  strcpy(patient_record->country, patient_record_tokens[4]);
+  /* Store entry_date using struct tm format */
+  memset(&patient_record->entry_date, 0, sizeof(struct tm));
+  strptime(patient_record_tokens[5], "%d-%m-%Y", &patient_record->entry_date);
+  /* Store exit_date using struct tm format */
+  memset(&patient_record->exit_date, 0, sizeof(struct tm));
+  strptime(patient_record_tokens[6], "%d-%m-%Y", &patient_record->exit_date);
+  /* Return patient record pointer */
+  return patient_record;
+}
+
 void patient_record_print(FILE* out, void* v) {
   patient_record_ptr patient_record = *((patient_record_ptr *) v);
   char entry_date_buffer[BUFFER_SIZE];
@@ -67,7 +95,7 @@ int validate_patient_record_tokens(char** patient_record_tokens) {
     if (!isalpha(patient_first_name[i]))
       return INVALID_PATIENT_FIRST_NAME;
   }
-  /* patient_first_name: Only letters */
+  /* patient_last_name: Only letters */
   char* patient_last_name = patient_record_tokens[2];
   for (size_t i = 0; i < strlen(patient_last_name); ++i) {
     if (!isalpha(patient_last_name[i]))

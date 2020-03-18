@@ -106,7 +106,11 @@ void read_patient_records_file_and_update_structures() {
     tokenize_string(buffer, PATIENT_RECORD_DELIMITER, patient_record_tokens);
     /* Check patient record tokens' validity */
     int code = validate_patient_record_tokens(patient_record_tokens);
-    printf(" %d\n",code);
+    if (code != VALID_PATIENT_RECORD) {
+      printf("TODO \n");
+    }
+    /* Create a new patient record */
+    patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
   }
   /* Close file pointer */
   fclose(fp);
