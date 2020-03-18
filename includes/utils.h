@@ -16,9 +16,9 @@
   uint8_t string_to_int64(char*, int64_t*);
 
   /* Hash Function for unsigned integers */
-  size_t hash_uint(unsigned int, size_t);
+  size_t hash_uint(void*, size_t);
   /* Hash Function for strings */
-  size_t hash_string(char*, size_t);
+  size_t hash_string(void*, size_t);
 
   /* Prints a given string */
   void print_string(void*);

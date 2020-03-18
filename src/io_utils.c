@@ -107,10 +107,11 @@ void read_patient_records_file_and_update_structures() {
     /* Check patient record tokens' validity */
     int code = validate_patient_record_tokens(patient_record_tokens);
     if (code != VALID_PATIENT_RECORD) {
-      printf("TODO \n");
+      printf("TODO \n"); // TODO
     }
     /* Create a new patient record */
     patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
+    hash_table_find(patient_record_ht, patient_record_tokens[0]);
   }
   /* Close file pointer */
   fclose(fp);

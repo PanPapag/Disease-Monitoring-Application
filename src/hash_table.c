@@ -12,7 +12,9 @@ bucket_ptr __bucket_create(size_t bucket_entries, size_t key_size, size_t value_
   bucket->table_ = (bucket_entry_t*) malloc(bucket_entries * sizeof(bucket_entry_t));
   for (size_t i = 0U; i != bucket_entries; ++i) {
     bucket->table_[i].key_ = malloc(key_size);
+    bucket->table_[i].key_ = NULL;
     bucket->table_[i].value_ = malloc(value_size);
+    bucket->table_[i].value_ = NULL;
   }
   return bucket;
 }
@@ -35,7 +37,7 @@ hash_table_ptr __hash_table_create(size_t key_size, size_t value_size,
                                    void (*value_print_func)(FILE*, void*)) {
 
   size_t entries_per_bucket_node_ = bucket_size / (key_size + value_size);
-  hash_table_ptr hash_table = malloc(sizeof(*hash_table));
+  hash_table_ptr hash_table = (hash_table_ptr) malloc(sizeof(*hash_table));
   hash_table->key_size_ = value_size;
   hash_table->value_size_ = value_size;
   hash_table->ht_entries_ = ht_entries;
@@ -64,4 +66,17 @@ void hash_table_clear(hash_table_ptr hash_table) {
   }
   free(hash_table->table_);
   free(hash_table);
+}
+
+void* hash_table_find(hash_table_ptr hash_table, void* key) {
+  size_t pos = hash_table->ht_hash_func_(key, hash_table->ht_entries_);
+  list_ptr entry_bucket_chain = hash_table->table_[pos];
+  size_t entry_no_buckets = list_size(entry_bucket_chain);
+  for (size_t i = 0U; i < entry_no_buckets; ++i) {
+    // TODO get bucket i-th
+    // TODO search bucket i-th for key 
+    printf("todo\n");
+  }
+  /* Nothing found return NULL */
+  return NULL;
 }

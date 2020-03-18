@@ -12,14 +12,15 @@ uint8_t string_to_int64(char* value, int64_t* value_out) {
     return 1;
 }
 
-size_t hash_uint(unsigned int x, size_t no_buckets) {
+size_t hash_uint(void* key, size_t no_buckets) {
+  unsigned int x = atoi(key);
   x = ((x >> 16) ^ x) * 0x45d9f3b;
   x = ((x >> 16) ^ x) * 0x45d9f3b;
   x = (x >> 16) ^ x;
   return x % no_buckets;
 }
 
-size_t hash_string(char* value, size_t no_buckets) {
+size_t hash_string(void* value, size_t no_buckets) {
   // djb2 hash function
   size_t hash = 5381;
   for (char* s = value; *s != '\0'; s++)

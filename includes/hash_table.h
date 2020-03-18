@@ -44,7 +44,9 @@
   /* Deletes hash table */
   void hash_table_clear(hash_table_ptr);
 
-  /* Adds an element to the avl tree */
-  void hash_table_insert(void*, void*);
+  /* Adds a pair of (key, value) to the hash table */
+  void hash_table_insert(hash_table_ptr*, void*, void*);
+  /* Given a key returns the value associated with it. NULL if not found */
+  void* hash_table_find(hash_table_ptr, void*);
 
 #endif
