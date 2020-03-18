@@ -111,7 +111,12 @@ void read_patient_records_file_and_update_structures() {
     }
     /* Create a new patient record */
     patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
-    hash_table_find(patient_record_ht, patient_record_tokens[0]);
+    int res = hash_table_insert(&patient_record_ht, &patient_record->record_id, &patient_record);
+    if (res == FAIL) {
+      printf("FAILED\n");
+    } else {
+      printf("SUCCESS\n");
+    }
   }
   /* Close file pointer */
   fclose(fp);

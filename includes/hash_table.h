@@ -4,6 +4,11 @@
   #include <stdint.h>
   #include "list.h"
 
+  enum ht_insert_codes {
+    FAIL,
+    SUCCESS
+  };
+
   typedef uint8_t byte_t;
 
   typedef struct bucket_t* bucket_ptr;
@@ -15,19 +20,19 @@
   } bucket_entry_t;
 
   struct bucket_t {
+    size_t key_size_;
+    size_t value_size_;
     bucket_entry_t* table_;
     int (*bucket_key_cmp_func_)(void*, void*);
+    void (*bucket_key_print_func_)(FILE*, void*);
+    void (*bucket_value_print_func_)(FILE*, void*);
     size_t bucket_entries_;
   } bucket_t;
 
   struct hash_table_t {
-    size_t key_size_;
-    size_t value_size_;
     size_t ht_entries_;
     list_ptr* table_;
     size_t (*ht_hash_func_)(const void*, const size_t);
-    void (*ht_key_print_func_)(FILE*, void*);
-    void (*ht_value_print_func_)(FILE*, void*);
   } hash_table_t;
 
   /*
@@ -46,8 +51,10 @@
   void hash_table_clear(hash_table_ptr);
 
   /* Adds a pair of (key, value) to the hash table */
-  void hash_table_insert(hash_table_ptr*, void*, void*);
+  int hash_table_insert(hash_table_ptr*, void*, void*);
   /* Given a key returns the value associated with it. NULL if not found */
   void* hash_table_find(hash_table_ptr, void*);
+  /* Utility function to print the whole hash table */
+  void hash_table_print(FILE* out, hash_table_ptr);
 
 #endif

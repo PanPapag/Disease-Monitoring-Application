@@ -89,7 +89,8 @@ int main(int argc, char* argv[]) {
   list_print(l, stdout);
   list_clear(l);
   */
-  hash_table_clear(patient_record_ht);
+  //hash_table_print(stdout, patient_record_ht);
+  //hash_table_clear(patient_record_ht);
 
   return EXIT_SUCCESS;
 }
