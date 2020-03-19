@@ -192,10 +192,48 @@ int validate_patient_record_tokens(char** patient_record_tokens) {
     string_to_int64(exit_date_buf, (int64_t *) &exit_date_to_secs);
     // Check if exit date is valid
     if (exit_date_to_secs < entry_date_to_secs)
-      return INVALID_EXIT_DATE;
+      return INVALID_EARLIER_EXIT_DATE;
   } else {
     return INVALID_EXIT_DATE;
   }
   /* Everything fine return success */
   return VALID_PATIENT_RECORD;
+}
+
+void print_patient_record_error(char** patient_record_tokens, int code) {
+  switch (code) {
+    case INVALID_RECORD_ID:
+      report_warning("Invalid Record ID: <%s> format. Discarding patient record.",
+                     patient_record_tokens[0]);
+      break;
+    case INVALID_PATIENT_FIRST_NAME:
+      report_warning("Invalid Patient First Name: <%s> format. Discarding patient record.",
+                     patient_record_tokens[1]);
+      break;
+    case INVALID_PATIENT_LAST_NAME:
+      report_warning("Invalid Patient Last Name: <%s> format. Discarding patient record.",
+                     patient_record_tokens[2]);
+      break;
+    case INVALID_DISEASE_ID:
+      report_warning("Invalid Disease ID: <%s> format. Discarding patient record.",
+                     patient_record_tokens[3]);
+      break;
+    case INVALID_COUNTRY:
+      report_warning("Invalid Country: <%s> format. Discarding patient record.",
+                     patient_record_tokens[4]);
+      break;
+    case INVALID_ENTRY_DATE:
+      report_warning("Invalid Entry Date: <%s> format. Discarding patient record.",
+                     patient_record_tokens[5]);
+      break;
+    case INVALID_EXIT_DATE:
+      report_warning("Invalid Exit Date: <%s> format. Discarding patient record.",
+                     patient_record_tokens[6]);
+      break;
+    case INVALID_EARLIER_EXIT_DATE:
+      report_warning("Invalid Exit Date: <%s> is earlier than Entry Date <%s>. "
+                     "Discarding patient record.",
+                     patient_record_tokens[6], patient_record_tokens[5]);
+      break;
+  }
 }

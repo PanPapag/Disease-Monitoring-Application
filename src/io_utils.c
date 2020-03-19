@@ -106,20 +106,21 @@ void read_patient_records_file_and_update_structures() {
     tokenize_string(buffer, PATIENT_RECORD_DELIMITER, patient_record_tokens);
     /* Check patient record tokens' validity */
     int code = validate_patient_record_tokens(patient_record_tokens);
-    if (code != VALID_PATIENT_RECORD) {
-      printf("TODO \n"); // TODO
-    }
-    /* Create a new patient record */
-    patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
-    int res = hash_table_insert(&patient_record_ht, patient_record->record_id, patient_record);
-    if (res == SUCCESS) {
-      /* Update disease hash table */
-      //printf("TODO\n");
-      int temp = 1;
-      /* Update country hash table */
+    if (code == VALID_PATIENT_RECORD) {
+      /* Create a new patient record */
+      patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
+      int res = hash_table_insert(&patient_record_ht, patient_record->record_id, patient_record);
+      if (res == SUCCESS) {
+        /* Update disease hash table */
+        //printf("TODO\n");
+        int temp = 1;
+        /* Update country hash table */
+      } else {
+        report_warning("Patient record with Record ID: <%s> already exists. "
+                       "Discarding patient record.", patient_record->record_id);
+      }
     } else {
-      report_warning("Patient record with Record ID: <%s> already exists. "
-                     "Discarding patient record.", patient_record->record_id);
+      print_patient_record_error(patient_record_tokens, code);
     }
   }
   /* Close file pointer */

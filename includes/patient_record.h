@@ -15,7 +15,8 @@
     INVALID_DISEASE_ID,
     INVALID_COUNTRY,
     INVALID_ENTRY_DATE,
-    INVALID_EXIT_DATE
+    INVALID_EXIT_DATE,
+    INVALID_EARLIER_EXIT_DATE
   };
 
   typedef struct patient_record {
@@ -47,5 +48,7 @@
     code if everything was fine or the correspodent error code.
   */
   int validate_patient_record_tokens(char**);
+  /* Print message given a patient_record error code */
+  void print_patient_record_error(char**, int);
 
 #endif
