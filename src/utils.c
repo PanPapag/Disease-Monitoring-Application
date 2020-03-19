@@ -13,7 +13,6 @@ uint8_t string_to_int64(char* value, int64_t* value_out) {
 }
 
 size_t hash_uint(void* key) {
-  printf("edw\n" );
   unsigned int x = atoi(key);
   x = ((x >> 16) ^ x) * 0x45d9f3b;
   x = ((x >> 16) ^ x) * 0x45d9f3b;

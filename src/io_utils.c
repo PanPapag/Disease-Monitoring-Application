@@ -87,6 +87,7 @@ void parse_arguments(int* argc, char* argv[]) {
 void read_patient_records_file_and_update_structures() {
   char buffer[BUFFER_SIZE], copy_buffer[BUFFER_SIZE];
   char *patient_record_tokens[NO_PATIENT_RECORD_TOKENS];
+  patient_record_ptr* t;
   /* Open file for read only - handles binary fille too */
   FILE* fp = fopen(parameters.patient_records_filename, "rb+");
   /* Read file line by line */
@@ -111,11 +112,15 @@ void read_patient_records_file_and_update_structures() {
     /* Create a new patient record */
     patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
     int res = hash_table_insert(&patient_record_ht, patient_record->record_id, patient_record);
-    // if (res == FAIL) {
-    //   printf("FAILED\n");
-    // } else {
-    //   printf("SUCCESS\n");
-    // }
+    if (res == SUCCESS) {
+      /* Update disease hash table */
+      //printf("TODO\n");
+      int temp = 1;
+      /* Update country hash table */
+    } else {
+      report_warning("Patient record with Record ID: <%s> already exists. "
+                     "Discarding patient record.", patient_record->record_id);
+    }
   }
   /* Close file pointer */
   fclose(fp);

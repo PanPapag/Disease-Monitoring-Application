@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../includes/list.h"
+#include "../includes/io_utils.h"
 
 list_ptr __list_create(size_t data_size,
                        int (*list_cmp_func)(void*, void*),
@@ -10,6 +11,10 @@ list_ptr __list_create(size_t data_size,
                        void (*list_data_delete_func)(void*)) {
 
   list_ptr list = malloc(sizeof(*list));
+  if (list == NULL) {
+    report_error("Could not allocate memory for List Data Structure. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   list->head_ = NULL;
   list->tail_ = NULL;
   list->size_ = 0U;
@@ -60,6 +65,10 @@ void list_push_front(list_ptr* list, void* new_data) {
   // + data_size means that the size of the variable-length
   // array 'data_' of the node will be of size data_size.
   list_node_ptr new_node = (list_node_ptr) malloc(sizeof(list_node_t) + (*list)->data_size_);
+  if (new_node == NULL) {
+    report_error("Could not allocate memory for List Node. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   memcpy(new_node->data_, new_data, (*list)->data_size_);
   /* Since we are adding at the begining, prev is always NULL */
   new_node->prev_ = NULL;
@@ -84,6 +93,10 @@ void list_push_back(list_ptr* list, void* new_data) {
   // + data_size means that the size of the variable-length
   // array 'data' of the node will be of size data_size.
   list_node_ptr new_node = (list_node_ptr) malloc(sizeof(list_node_t) + (*list)->data_size_);
+  if (new_node == NULL) {
+    report_error("Could not allocate memory for List Node. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   memcpy(new_node->data_, new_data, (*list)->data_size_);
   /* Since we are adding at the end, next is always NULL */
   new_node->next_ = NULL;
@@ -111,6 +124,10 @@ void list_sorted_insert(list_ptr* list, void *new_data) {
   // + data_size means that the size of the variable-length
   // array 'data' of the node will be of size data_size.
   list_node_ptr new_node = (list_node_ptr) malloc(sizeof(list_node_t) + (*list)->data_size_);
+  if (new_node == NULL) {
+    report_error("Could not allocate memory for List Node. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   memcpy(new_node->data_, new_data, (*list)->data_size_);
   new_node->prev_ = new_node->next_ = NULL;
   /* If list is empty */

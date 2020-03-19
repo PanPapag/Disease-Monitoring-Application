@@ -8,25 +8,50 @@
 
 #include "../includes/macros.h"
 #include "../includes/patient_record.h"
+#include "../includes/io_utils.h"
 #include "../includes/utils.h"
 
 patient_record_ptr patient_record_create(char** patient_record_tokens) {
   /* Allocate memory for patient_record_ptr */
   patient_record_ptr patient_record = malloc(sizeof(*patient_record));
+  if (patient_record == NULL) {
+    report_error("Could not allocate memory for Patient Record. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   /* Allocate memory and store record_id */
   patient_record->record_id = (char*) malloc((strlen(patient_record_tokens[0]) + 1) * sizeof(char));
+  if (patient_record->record_id == NULL) {
+    report_error("Could not allocate memory for Patient Record Record ID. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   strcpy(patient_record->record_id, patient_record_tokens[0]);
   /* Allocate memory and store patient_first_name */
   patient_record->patient_first_name = (char*) malloc((strlen(patient_record_tokens[1]) + 1) * sizeof(char));
+  if (patient_record->patient_first_name == NULL) {
+    report_error("Could not allocate memory for Patient Record First Name. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   strcpy(patient_record->patient_first_name, patient_record_tokens[1]);
   /* Allocate memory and store patient_last_name */
   patient_record->patient_last_name = (char*) malloc((strlen(patient_record_tokens[2]) + 1) * sizeof(char));
+  if (patient_record->patient_last_name == NULL) {
+    report_error("Could not allocate memory for Patient Record Last Name. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   strcpy(patient_record->patient_last_name, patient_record_tokens[2]);
   /* Allocate memory and store disease_id */
   patient_record->disease_id = (char*) malloc((strlen(patient_record_tokens[3]) + 1) * sizeof(char));
+  if (patient_record->disease_id == NULL) {
+    report_error("Could not allocate memory for Patient Record Disease ID. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   strcpy(patient_record->disease_id, patient_record_tokens[3]);
   /* Allocate memory and store country */
   patient_record->country = (char*) malloc((strlen(patient_record_tokens[4]) + 1) * sizeof(char));
+  if (patient_record->country == NULL) {
+    report_error("Could not allocate memory for Patient Record Country. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   strcpy(patient_record->country, patient_record_tokens[4]);
   /* Store entry_date using struct tm format */
   memset(&patient_record->entry_date, 0, sizeof(struct tm));
@@ -75,7 +100,7 @@ int patient_record_compare(void* a, void* b) {
 void patient_record_delete(void* v) {
   patient_record_ptr patient_record = (patient_record_ptr *) v;
   if (patient_record != NULL) {
-    __FREE(patient_record->record_id);    
+    __FREE(patient_record->record_id);
     __FREE(patient_record->disease_id);
     __FREE(patient_record->patient_first_name);
     __FREE(patient_record->patient_last_name);

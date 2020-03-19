@@ -9,8 +9,16 @@
 static inline
 bucket_ptr __bucket_create(hash_table_ptr hash_table, size_t bucket_entries) {
   bucket_ptr bucket = (bucket_ptr) malloc(sizeof(*bucket));
+  if (bucket == NULL) {
+    report_error("Could not allocate memory for Hash Table Bucket. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   bucket->bucket_size_ = 0U;
   bucket->table_ = (bucket_entry_ptr) malloc(hash_table->bucket_entries_ * sizeof(bucket_entry_t));
+  if (bucket->table_ == NULL) {
+    report_error("Could not allocate memory for Hash Table Bucket Table. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   for (size_t i = 0U; i != hash_table->bucket_entries_; ++i) {
     bucket->table_[i].key_ = NULL;
     bucket->table_[i].value_ = NULL;
@@ -93,6 +101,10 @@ hash_table_ptr hash_table_create(size_t ht_entries, size_t bucket_size,
 
   /* Allocate memory for the newly created hash table */
   hash_table_ptr hash_table = (hash_table_ptr) malloc(sizeof(*hash_table));
+  if (hash_table == NULL) {
+    report_error("Could not allocate memory for Hash Table Data Structure. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   /* Initialize hash table */
   hash_table->ht_entries_ = ht_entries;
   /* Each bucket stores two void pointers size of 8 bytes, so in total 16 bytes */
@@ -105,6 +117,10 @@ hash_table_ptr hash_table_create(size_t ht_entries, size_t bucket_size,
   hash_table->ht_key_delete_func_ = key_delete_func;
   hash_table->ht_value_delete_func_ = value_delete_func;
   hash_table->table_ = (list_ptr*) malloc(ht_entries * sizeof(list_ptr));
+  if (hash_table->table_ == NULL) {
+    report_error("Could not allocate memory for Hash Table Table. Exiting...");
+    exit(EXIT_FAILURE);
+  }
   for (size_t i = 0U; i != ht_entries; ++i) {
     hash_table->table_[i] = list_create(bucket_ptr, value_cmp_func, value_print_func, NULL);
     bucket_ptr bucket = __bucket_create(hash_table, hash_table->bucket_entries_);

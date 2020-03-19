@@ -153,7 +153,7 @@ int main(int argc, char* argv[]) {
   hash_table_print(test_ht, stdout);
   hash_table_clear(test_ht);
   */
-  hash_table_print(patient_record_ht, stdout);
+  //hash_table_print(patient_record_ht, stdout);
   hash_table_clear(patient_record_ht);
   return EXIT_SUCCESS;
 }
