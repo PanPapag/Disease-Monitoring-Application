@@ -12,7 +12,7 @@
 
 patient_record_ptr patient_record_create(char** patient_record_tokens) {
   /* Allocate memory for patient_record_ptr */
-  patient_record_ptr patient_record = (patient_record_ptr) malloc(sizeof(*patient_record));
+  patient_record_ptr patient_record = malloc(sizeof(*patient_record));
   /* Allocate memory and store record_id */
   patient_record->record_id = (char*) malloc((strlen(patient_record_tokens[0]) + 1) * sizeof(char));
   strcpy(patient_record->record_id, patient_record_tokens[0]);
@@ -46,6 +46,7 @@ void patient_record_print(FILE* out, void* v) {
   fprintf(out, "Patient First Name: %s\n", patient_record->patient_first_name);
   fprintf(out, "Patient Last Name: %s\n", patient_record->patient_last_name);
   fprintf(out, "Disease ID: %s\n", patient_record->disease_id);
+  fprintf(out, "Country: %s\n", patient_record->country);
   strftime(entry_date_buffer, sizeof(entry_date_buffer), "%d-%m-%Y", &patient_record->entry_date);
   fprintf(out, "Entry Date: %s\n", entry_date_buffer);
   strftime(exit_date_buffer, sizeof(exit_date_buffer), "%d-%m-%Y", &patient_record->exit_date);

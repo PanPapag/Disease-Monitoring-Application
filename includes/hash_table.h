@@ -22,11 +22,13 @@
   struct bucket_t {
     size_t key_size_;
     size_t value_size_;
+    size_t bucket_entries_;
     bucket_entry_t* table_;
     int (*bucket_key_cmp_func_)(void*, void*);
     void (*bucket_key_print_func_)(FILE*, void*);
     void (*bucket_value_print_func_)(FILE*, void*);
-    size_t bucket_entries_;
+    void (*bucket_key_delete_func_)(void*);
+    void (*bucket_value_delete_func_)(void*);
   } bucket_t;
 
   struct hash_table_t {
@@ -39,13 +41,14 @@
    Creates a new hash table given a type, number of entries, bucket size,
    hash, compare and print functions.
   */
-  #define hash_table_create(kt, vt, ne, bs, hf, kcf, vcf, kpf, vpf) \
+  #define hash_table_create(kt, vt, ne, bs, hf, kcf, vcf, kpf, vpf, kdf, vdf) \
   ({ \
-    __hash_table_create(sizeof(kt), sizeof(vt), ne, bs, hf, kcf, vcf, kpf, vpf); \
+    __hash_table_create(sizeof(kt), sizeof(vt), ne, bs, hf, kcf, vcf, kpf, vpf, kdf, vdf); \
   })
   hash_table_ptr __hash_table_create(size_t, size_t, size_t, size_t,
     size_t (*)(const void*, const size_t), int (*)(void*, void*),
-    int (*)(void*, void*), void (*)(FILE*, void*), void (*)(FILE*, void*));
+    int (*)(void*, void*), void (*)(FILE*, void*), void (*)(FILE*, void*),
+    void (*)(void*), void (*)(void*));
 
   /* Deletes hash table */
   void hash_table_clear(hash_table_ptr);

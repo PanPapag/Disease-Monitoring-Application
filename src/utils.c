@@ -21,16 +21,17 @@ size_t hash_uint(void* key, size_t no_buckets) {
 }
 
 size_t hash_string(void* value, size_t no_buckets) {
-  char* str = *((char**) value);
+  char* str = (*(char**) value);
   // djb2 hash function
   size_t hash = 5381;
-  for (char* s = str; *s != '\0'; s++)
-	  hash = (hash << 5) + hash + *s;
+  for (char* s = str; *s != '\0'; s++) {
+    hash = (hash << 5) + hash + *s;
+  }
   return hash % no_buckets;
 }
 
-void print_string(void* v) {
-  printf("%s\n", *((char**) v));
+void print_string(FILE* out, void* v) {
+  fprintf(out, "%s\n", (*(char**) v));
 }
 
 int compare_string(void* v, void* w) {

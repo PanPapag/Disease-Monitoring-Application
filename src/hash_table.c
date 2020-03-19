@@ -11,6 +11,8 @@ bucket_ptr __bucket_create(size_t bucket_entries,
                            int (*key_cmp_func)(void*, void*),
                            int (*key_print_func)(FILE*, void*),
                            int (*value_print_func)(FILE*, void*),
+                           void (*key_delete_func)(void*),
+                           void (*value_delete_func)(void*),
                            size_t key_size, size_t value_size) {
 
   bucket_ptr bucket = (bucket_ptr) malloc(sizeof(*bucket));
@@ -20,6 +22,8 @@ bucket_ptr __bucket_create(size_t bucket_entries,
   bucket->bucket_key_cmp_func_ = key_cmp_func;
   bucket->bucket_key_print_func_ = key_print_func;
   bucket->bucket_value_print_func_ = value_print_func;
+  bucket->bucket_key_delete_func_ = key_delete_func;
+  bucket->bucket_value_delete_func_ = value_delete_func;
   bucket->table_ = (bucket_entry_t*) malloc(bucket_entries * sizeof(bucket_entry_t));
   for (size_t i = 0U; i != bucket_entries; ++i) {
     bucket->table_[i].key_ = malloc(key_size);
@@ -36,12 +40,15 @@ int __bucket_insert(bucket_ptr* bucket, void* key, void* value) {
     if ((*bucket)->table_[i].key_ == NULL) {
       (*bucket)->table_[i].key_ = key;
       (*bucket)->table_[i].value_ = value;
+      printf("K %p\n",(*bucket)->table_[i].key_);
+      printf("V %p\n",(*bucket)->table_[i].value_);
       // printf("%s\n",(*(char**)(*bucket)->table_[i].key_));
       // patient_record_print(stdout, (*bucket)->table_[i].value_);
       // printf("--------------------\n");
-
-      //memcpy((*bucket)->table_[i].key_, key, (*bucket)->key_size_);
-      //memcpy((*bucket)->table_[i].value_, value, (*bucket)->value_size_);
+      // // memcpy((*bucket)->table_[i].key_, key, (*bucket)->key_size_);
+      // memcpy((*bucket)->table_[i].value_, value, (*bucket)->value_size_);
+      (*bucket)->bucket_key_print_func_(stdout, (*bucket)->table_[i].key_);
+      (*bucket)->bucket_value_print_func_(stdout, (*bucket)->table_[i].value_);
       return SUCCESS;
     }
   }
@@ -54,6 +61,10 @@ void* __bucket_find(bucket_ptr bucket, void* key) {
     if (bucket->table_[i].key_ != NULL) {
       int res = bucket->bucket_key_cmp_func_(bucket->table_[i].key_, key);
       if (res) {
+        // bucket->bucket_key_print_func_(stdout, bucket->table_[i].key_);
+        // bucket->bucket_value_print_func_(stdout, bucket->table_[i].value_);
+        // bucket->bucket_key_print_func_(stdout, key);
+        // printf("--------------------------\n" );
         return bucket->table_[i].value_;
       }
     }
@@ -65,6 +76,8 @@ static inline
 void __bucket_print(FILE* out, bucket_ptr bucket) {
   for (size_t i = 0U; i != bucket->bucket_entries_; ++i) {
     if (bucket->table_[i].key_ != NULL) {
+      // printf("K' %p\n", bucket->table_[i].key_);
+      // printf("V' %p\n", bucket->table_[i].value_);
       bucket->bucket_key_print_func_(out, bucket->table_[i].key_);
       bucket->bucket_value_print_func_(out, bucket->table_[i].value_);
     }
@@ -74,8 +87,8 @@ void __bucket_print(FILE* out, bucket_ptr bucket) {
 static inline
 void __bucket_clear(bucket_ptr bucket) {
   for (size_t i = 0U; i != bucket->bucket_entries_; ++i) {
-    free(bucket->table_[i].key_);
-    free(bucket->table_[i].value_);
+    bucket->bucket_key_delete_func_(bucket->table_[i].key_);
+    bucket->bucket_value_delete_func_(bucket->table_[i].value_);
   }
   free(bucket->table_);
   free(bucket);
@@ -87,7 +100,9 @@ hash_table_ptr __hash_table_create(size_t key_size, size_t value_size,
                                    int (*key_cmp_func)(void*, void*),
                                    int (*value_cmp_func)(void*, void*),
                                    void (*key_print_func)(FILE*, void*),
-                                   void (*value_print_func)(FILE*, void*)) {
+                                   void (*value_print_func)(FILE*, void*),
+                                   void (*key_delete_func)(void*),
+                                   void (*value_delete_func)(void*)) {
 
   size_t entries_per_bucket_node_ = bucket_size / (key_size + value_size);
   hash_table_ptr hash_table = (hash_table_ptr) malloc(sizeof(*hash_table));
@@ -99,6 +114,7 @@ hash_table_ptr __hash_table_create(size_t key_size, size_t value_size,
     bucket_ptr bucket = __bucket_create(entries_per_bucket_node_,
                                         key_cmp_func,
                                         key_print_func, value_print_func,
+                                        key_delete_func, value_delete_func,
                                         key_size, value_size);
     list_push_front(&hash_table->table_[i], &bucket);
   }
@@ -121,6 +137,7 @@ void hash_table_clear(hash_table_ptr hash_table) {
 }
 
 int hash_table_insert(hash_table_ptr* hash_table, void* key, void* value) {
+  //printf("TEST IN: %p\n",value);
   void* result = hash_table_find(*hash_table, key);
   if (result == NULL) {
     size_t pos = (*hash_table)->ht_hash_func_(key, (*hash_table)->ht_entries_);
@@ -139,6 +156,8 @@ int hash_table_insert(hash_table_ptr* hash_table, void* key, void* value) {
                                                   entry_bucket->bucket_key_cmp_func_,
                                                   entry_bucket->bucket_key_print_func_,
                                                   entry_bucket->bucket_value_print_func_,
+                                                  entry_bucket->bucket_key_delete_func_,
+                                                  entry_bucket->bucket_value_delete_func_,
                                                   entry_bucket->key_size_,
                                                   entry_bucket->value_size_);
           list_push_back((*hash_table)->table_[i], &new_bucket);
@@ -162,22 +181,18 @@ void* hash_table_find(hash_table_ptr hash_table, void* key) {
       break;
     } else {
       bucket_ptr entry_bucket = *((bucket_ptr*) list_node->data_);
-      void* result = __bucket_find(entry_bucket, key);
-      if (result != NULL) {
-        return result;
-      }
+      return __bucket_find(entry_bucket, key);
     }
   }
-  /* Nothing found return NULL */
-  return NULL;
 }
 
 void hash_table_print(FILE* out, hash_table_ptr hash_table) {
+  printf("----------------------------------------------------------------------\n" );
   for (size_t i = 0U; i < hash_table->ht_entries_; ++i) {
     list_ptr entry_bucket_chain = hash_table->table_[i];
     size_t entry_no_buckets = list_size(entry_bucket_chain);
-    for (size_t i = 1U; i <= entry_no_buckets; ++i) {
-      list_node_ptr list_node = list_get(entry_bucket_chain, i);
+    for (size_t j = 1U; j <= entry_no_buckets; ++j) {
+      list_node_ptr list_node = list_get(entry_bucket_chain, j);
       if (list_node == NULL) {
         report_warning("Bucket chain index is out of bounds!");
         break;

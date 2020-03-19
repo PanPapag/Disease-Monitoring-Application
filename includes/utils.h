@@ -21,7 +21,7 @@
   size_t hash_string(void*, size_t);
 
   /* Prints a given string */
-  void print_string(void*);
+  void print_string(FILE*, void*);
   /* Compares two given strings */
   int compare_string(void*, void*);
 
