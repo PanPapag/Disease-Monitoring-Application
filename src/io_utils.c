@@ -157,22 +157,54 @@ int handle_command(char command[]) {
   command_no_tokens = p.we_wordc;
   /* Call correspoding command function */
   if (!strcmp(command_tokens[0], "globalDiseaseStats")) {
-    printf("globalDiseaseStats command\n");
+    if (validate_global_disease_stats(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else if (!strcmp(command_tokens[0], "diseaseFrequency")) {
-    printf("diseaseFrequency command\n");
+    if (validate_disease_frequency(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else if (!strcmp(command_tokens[0], "topk-Diseases")) {
-    printf("topk-Diseases command\n");
+    if (validate_topk_diseases(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else if (!strcmp(command_tokens[0], "topk-Countries")) {
-    printf("topk-Countries command");
+    if (validate_topk_countries(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else if (!strcmp(command_tokens[0], "insertPatientRecord")) {
-    printf("insertPatientRecord command\n");
+    if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else if (!strcmp(command_tokens[0], "recordPatientExit")) {
-    printf("recordPatientExit command\n");
+    if (validate_record_patient_exit(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else if (!strcmp(command_tokens[0], "numCurrentPatients")) {
-    printf("numCurrentPatients command\n");
+    if (validate_num_current_patients(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else if (!strcmp(command_tokens[0], "exit")) {
-    printf("exit command\n");
-    command_code = EXIT;
+    if (validate_exit(command_no_tokens, command_tokens)) {
+      printf("EXECUTE\n");
+      command_code = EXIT;
+    } else {
+      report_warning("Invalid <%s> command.", command_tokens[0]);
+    }
   } else {
     report_warning("Unknown command: <%s>.", command);
   }
