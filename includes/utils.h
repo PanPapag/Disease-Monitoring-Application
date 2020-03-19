@@ -16,14 +16,17 @@
   uint8_t string_to_int64(char*, int64_t*);
 
   /* Hash Function for unsigned integers */
-  size_t hash_uint(void*, size_t);
+  size_t hash_uint(void*);
   /* Hash Function for strings */
-  size_t hash_string(void*, size_t);
+  size_t hash_string(void*);
 
   /* Prints a given string */
   void print_string(FILE*, void*);
+
   /* Compares two given strings */
   int compare_string(void*, void*);
+  /* Free a pointer to char */
+  void destroy_string(void*);
 
   /* Tokenizes a string given a delimiter and returns the tokens to an array */
   void tokenize_string(char*, char[], char**);

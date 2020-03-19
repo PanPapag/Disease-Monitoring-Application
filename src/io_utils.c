@@ -110,9 +110,7 @@ void read_patient_records_file_and_update_structures() {
     }
     /* Create a new patient record */
     patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
-    // printf("%p\n",patient_record);
-    // printf("%p\n", *patient_record);
-    int res = hash_table_insert(&patient_record_ht, &patient_record->record_id, &patient_record);
+    int res = hash_table_insert(&patient_record_ht, patient_record->record_id, patient_record);
     // if (res == FAIL) {
     //   printf("FAILED\n");
     // } else {

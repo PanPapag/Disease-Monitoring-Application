@@ -3,43 +3,42 @@
 #include <time.h>
 
 //#include "../includes/avl.h"
-#include "../includes/list.h"
+//#include "../includes/list.h"
 #include "../includes/macros.h"
 #include "../includes/hash_table.h"
 #include "../includes/patient_record.h"
 #include "../includes/utils.h"
 
-int global_counter;
 
-test_ptr create_test_ptr(int a, int b) {
-  test_ptr test = (test_ptr) malloc((sizeof(*test)));
-  test->a = a;
-  test->b = b;
-  return test;
-}
-
-void test_print(FILE* out, void* v) {
-  test_ptr t = (*(test_ptr *) v);
-  fprintf(out, "A: %d\n", t->a);
-  fprintf(out, "B: %d\n", t->b);
-  printf("\n");
-}
-
-int test_compare(void* v, void* b) {
-  test_ptr k = (*(test_ptr *) v);
-  test_ptr m = (*(test_ptr *) v);
-  return k->a - m->a;
-}
-
-void destroy_test(void* v) {
-  test_ptr t = (*(test_ptr *) v);
-  free(t);
-}
-
-void destroy_str(void *v) {
-  char* s = (char *)v;
-  free(s);
-}
+// test_ptr create_test_ptr(int a, int b) {
+//   test_ptr test = (test_ptr) malloc((sizeof(*test)));
+//   test->a = a;
+//   test->b = b;
+//   return test;
+// }
+//
+// void test_print(FILE* out, void* v) {
+//   test_ptr t = (test_ptr *) v;
+//   fprintf(out, "A: %d\n", t->a);
+//   fprintf(out, "B: %d\n", t->b);
+//   printf("\n");
+// }
+//
+// int test_compare(void* v, void* b) {
+//   test_ptr k = (test_ptr *) v;
+//   test_ptr m = (test_ptr *) v;
+//   return k->a - m->a;
+// }
+//
+// void destroy_test(void* v) {
+//   test_ptr t = (test_ptr *) v;
+//   free(t);
+// }
+//
+// void destroy_str(void *v) {
+//   char* s = (char *)v;
+//   free(s);
+// }
 
 
 program_parameters_t parameters;
@@ -53,12 +52,12 @@ int main(int argc, char* argv[]) {
   /* Define number of buckets as the max size of disease and country hash table */
   size_t no_buckets = MAX(parameters.ht_disease_size, parameters.ht_country_size);
   /* patient_record_ht: record id --> pointer to patient record structure */
-  // patient_record_ht = hash_table_create(STRING, patient_record_ptr,
-  //                                       no_buckets, parameters.bucket_size,
-  //                                       hash_string,
-  //                                       compare_string, patient_record_compare,
-  //                                       print_string, patient_record_print);
-  //read_patient_records_file_and_update_structures();
+  patient_record_ht = hash_table_create(no_buckets, parameters.bucket_size,
+                                        hash_string,
+                                        compare_string, patient_record_compare,
+                                        print_string, patient_record_print,
+                                        NULL, patient_record_delete);
+  read_patient_records_file_and_update_structures();
   /* Create Disease Hash Table */ /*
   hash_table_ptr disease_ht = hash_table_create(char*, avl_ptr,
                                                 parameters.ht_disease_size,
@@ -126,12 +125,13 @@ int main(int argc, char* argv[]) {
   //hash_table_print(stdout, patient_record_ht);
   //hash_table_clear(patient_record_ht);
   // ------------------------------ HT TEST ----------------------------------
-  hash_table_ptr test_ht = hash_table_create(STRING, test_ptr,
-                                            no_buckets, parameters.bucket_size,
+  /*
+  hash_table_ptr test_ht = hash_table_create(no_buckets, parameters.bucket_size,
                                             hash_string,
                                             compare_string, test_compare,
                                             print_string, test_print,
                                             destroy_str, destroy_test);
+
   int a, b;
   test_ptr test;
   char *key[5];
@@ -143,14 +143,17 @@ int main(int argc, char* argv[]) {
   strcpy(key[2],"@HELENI@");
   strcpy(key[3],"ANASTASI");
   strcpy(key[4],"@@MEMA@@");
-  for (int i = 0; i < 1; ++i) {
+  for (int i = 0; i < 5; ++i) {
     a = (i * 10) + 1;
     b = (a * 2) + 2;
     test_ptr test = create_test_ptr(a,b);
-    hash_table_insert(&test_ht, &key[i], &test);
+    hash_table_insert(&test_ht, key[i], test);
   }
   printf("----------------------------------------------------------------------\n" );
-  //hash_table_print(stdout, test_ht);
-  //hash_table_clear(test_ht);
+  hash_table_print(test_ht, stdout);
+  hash_table_clear(test_ht);
+  */
+  hash_table_print(patient_record_ht, stdout);
+  hash_table_clear(patient_record_ht);
   return EXIT_SUCCESS;
 }

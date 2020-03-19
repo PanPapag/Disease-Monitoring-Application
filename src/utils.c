@@ -12,32 +12,37 @@ uint8_t string_to_int64(char* value, int64_t* value_out) {
     return 1;
 }
 
-size_t hash_uint(void* key, size_t no_buckets) {
+size_t hash_uint(void* key) {
+  printf("edw\n" );
   unsigned int x = atoi(key);
   x = ((x >> 16) ^ x) * 0x45d9f3b;
   x = ((x >> 16) ^ x) * 0x45d9f3b;
   x = (x >> 16) ^ x;
-  return x % no_buckets;
+  return x;
 }
 
-size_t hash_string(void* value, size_t no_buckets) {
-  char* str = (*(char**) value);
+size_t hash_string(void* value) {
   // djb2 hash function
   size_t hash = 5381;
-  for (char* s = str; *s != '\0'; s++) {
+  for (char* s = value; *s != '\0'; s++) {
     hash = (hash << 5) + hash + *s;
   }
-  return hash % no_buckets;
+  return hash;
 }
 
 void print_string(FILE* out, void* v) {
-  fprintf(out, "%s\n", ((char*) v));
+  fprintf(out, "%s\n", (char*) v);
 }
 
 int compare_string(void* v, void* w) {
-  char* str1 = *((char**) v);
-  char* str2 = *((char**) w);
+  char* str1 = (char*) v;
+  char* str2 = (char*) w;
   return strcmp(str1, str2);
+}
+
+void destroy_string(void *v) {
+  char* s = (char *)v;
+  free(s);
 }
 
 void tokenize_string(char* value, char delimiter[], char **res) {

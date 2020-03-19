@@ -39,7 +39,7 @@ patient_record_ptr patient_record_create(char** patient_record_tokens) {
 }
 
 void patient_record_print(FILE* out, void* v) {
-  patient_record_ptr patient_record = *((patient_record_ptr *) v);
+  patient_record_ptr patient_record = (patient_record_ptr *) v;
   char entry_date_buffer[BUFFER_SIZE];
   char exit_date_buffer[BUFFER_SIZE];
   fprintf(out, "Record ID: %s\n", patient_record->record_id);
@@ -59,8 +59,8 @@ void patient_record_print(FILE* out, void* v) {
 }
 
 int patient_record_compare(void* a, void* b) {
-	patient_record_ptr pr1 = *((patient_record_ptr *) a);
-	patient_record_ptr pr2 = *((patient_record_ptr *) b);
+	patient_record_ptr pr1 = (patient_record_ptr *) a;
+	patient_record_ptr pr2 = (patient_record_ptr *) b;
   char pr1_entry_date_buffer[BUFFER_SIZE];
   char pr2_entry_date_buffer[BUFFER_SIZE];
   strftime(pr1_entry_date_buffer, sizeof(pr1_entry_date_buffer), "%s", &pr1->entry_date);
@@ -73,12 +73,13 @@ int patient_record_compare(void* a, void* b) {
 }
 
 void patient_record_delete(void* v) {
-  patient_record_ptr patient_record = *((patient_record_ptr *) v);
+  patient_record_ptr patient_record = (patient_record_ptr *) v;
   if (patient_record != NULL) {
-    __FREE(patient_record->record_id);
+    __FREE(patient_record->record_id);    
     __FREE(patient_record->disease_id);
     __FREE(patient_record->patient_first_name);
     __FREE(patient_record->patient_last_name);
+    __FREE(patient_record->country);
     __FREE(patient_record);
   }
 }
