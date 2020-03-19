@@ -31,7 +31,7 @@ size_t hash_string(void* value, size_t no_buckets) {
 }
 
 void print_string(FILE* out, void* v) {
-  fprintf(out, "%s\n", (*(char**) v));
+  fprintf(out, "%s\n", ((char*) v));
 }
 
 int compare_string(void* v, void* w) {

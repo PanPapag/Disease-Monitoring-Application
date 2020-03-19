@@ -40,8 +40,7 @@ int __bucket_insert(bucket_ptr* bucket, void* key, void* value) {
     if ((*bucket)->table_[i].key_ == NULL) {
       (*bucket)->table_[i].key_ = key;
       (*bucket)->table_[i].value_ = value;
-      printf("K %p\n",(*bucket)->table_[i].key_);
-      printf("V %p\n",(*bucket)->table_[i].value_);
+      printf("BUCKET VALUE: %p\n",(*bucket)->table_[i].value_));
       // printf("%s\n",(*(char**)(*bucket)->table_[i].key_));
       // patient_record_print(stdout, (*bucket)->table_[i].value_);
       // printf("--------------------\n");
@@ -137,7 +136,7 @@ void hash_table_clear(hash_table_ptr hash_table) {
 }
 
 int hash_table_insert(hash_table_ptr* hash_table, void* key, void* value) {
-  //printf("TEST IN: %p\n",value);
+  printf("HT INSERT VALUE: %p\n",(*(test_ptr *)value));
   void* result = hash_table_find(*hash_table, key);
   if (result == NULL) {
     size_t pos = (*hash_table)->ht_hash_func_(key, (*hash_table)->ht_entries_);
@@ -161,7 +160,7 @@ int hash_table_insert(hash_table_ptr* hash_table, void* key, void* value) {
                                                   entry_bucket->key_size_,
                                                   entry_bucket->value_size_);
           list_push_back((*hash_table)->table_[i], &new_bucket);
-          __bucket_insert(&new_bucket, key, value);
+          __bucket_insert(&new_bucket, key, (*(test_ptr *)value));
         }
         return SUCCESS;
       }

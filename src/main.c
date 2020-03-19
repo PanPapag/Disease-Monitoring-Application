@@ -3,20 +3,13 @@
 #include <time.h>
 
 //#include "../includes/avl.h"
-//#include "../includes/list.h"
+#include "../includes/list.h"
 #include "../includes/macros.h"
 #include "../includes/hash_table.h"
 #include "../includes/patient_record.h"
 #include "../includes/utils.h"
 
 int global_counter;
-
-typedef struct test_t {
-  int a;
-  int b;
-} test_t;
-
-typedef test_t* test_ptr;
 
 test_ptr create_test_ptr(int a, int b) {
   test_ptr test = (test_ptr) malloc((sizeof(*test)));
@@ -144,21 +137,20 @@ int main(int argc, char* argv[]) {
   char *key[5];
   for (int i = 0; i < 5; ++i)
     key[i] = (char*) malloc(sizeof(char) * 9);
+
   strcpy(key[0],"PANTELIS");
   strcpy(key[1],"@KOSTAS@");
   strcpy(key[2],"@HELENI@");
   strcpy(key[3],"ANASTASI");
   strcpy(key[4],"@@MEMA@@");
-  for (int i = 0; i < 2; ++i) {
-    a = i * 10;
-    b = a * 2;
+  for (int i = 0; i < 1; ++i) {
+    a = (i * 10) + 1;
+    b = (a * 2) + 2;
     test_ptr test = create_test_ptr(a,b);
-    // printf("KEY: %p\n", key[i]);
-    // printf("TEST: %p\n",test);
     hash_table_insert(&test_ht, &key[i], &test);
   }
-  hash_table_print(stdout, test_ht);
-
+  printf("----------------------------------------------------------------------\n" );
+  //hash_table_print(stdout, test_ht);
   //hash_table_clear(test_ht);
   return EXIT_SUCCESS;
 }
