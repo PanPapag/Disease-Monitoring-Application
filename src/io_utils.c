@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <wordexp.h>
 
 #include "../includes/hash_table.h"
 #include "../includes/macros.h"
@@ -85,25 +86,25 @@ void parse_arguments(int* argc, char* argv[]) {
 }
 
 void read_patient_records_file_and_update_structures() {
-  char buffer[BUFFER_SIZE], copy_buffer[BUFFER_SIZE];
-  char *patient_record_tokens[NO_PATIENT_RECORD_TOKENS];
+  char buffer[BUFFER_SIZE];
+  char **patient_record_tokens;
+  int patient_record_no_tokens;
   patient_record_ptr* t;
+  wordexp_t p;
   /* Open file for read only - handles binary fille too */
   FILE* fp = fopen(parameters.patient_records_filename, "rb+");
   /* Read file line by line */
   while (fgets(buffer, sizeof(buffer), fp) != NULL) {
     /* Discard '\n' that fgets() stores */
     buffer[strlen(buffer) - 1] = '\0';
-    /* Copy line to another buffer in order to be tokenized independently */
-    memset(copy_buffer, 0, sizeof(copy_buffer));
-    strcpy(copy_buffer, buffer);
+    wordexp(buffer, &p, 0);
+    patient_record_tokens = p.we_wordv;
+    patient_record_no_tokens = p.we_wordc;
     /* Count tokens to check if patient record is valid */
-    if (count_tokens(copy_buffer, PATIENT_RECORD_DELIMITER) != NO_PATIENT_RECORD_TOKENS) {
+    if (patient_record_no_tokens != NO_PATIENT_RECORD_TOKENS) {
       report_error("Invalid number of arguments in patient record <%s>. "
                    "Discarding patient record.", buffer);
     }
-    /* Store each token of the line into an array */
-    tokenize_string(buffer, PATIENT_RECORD_DELIMITER, patient_record_tokens);
     /* Check patient record tokens' validity */
     int code = validate_patient_record_tokens(patient_record_tokens);
     if (code == VALID_PATIENT_RECORD) {
@@ -122,9 +123,63 @@ void read_patient_records_file_and_update_structures() {
     } else {
       print_patient_record_error(patient_record_tokens, code);
     }
+    /* Free wordexp object */
+    wordfree(&p);
   }
   /* Close file pointer */
   fclose(fp);
+}
+
+void main_loop(void) {
+  char command[BUFFER_SIZE];
+  while (1) {
+    /* Read command from the stdin */
+    printf("> ");
+    memset(&command, 0, sizeof(command));
+    fgets(command, BUFFER_SIZE, stdin);
+    command[strlen(command) - 1] = '\0';
+    /* Handle command and call correspodent function */
+    int result = handle_command(command);
+    if (result == EXIT) {
+      break;
+    }
+  }
+}
+
+int handle_command(char command[]) {
+  wordexp_t p;
+  int command_no_tokens;
+  char** command_tokens;
+  int command_code = CONTINUE;
+  /* Use API POSIX to extract arguments */
+  wordexp(command, &p, 0);
+  command_tokens = p.we_wordv;
+  command_no_tokens = p.we_wordc;
+  /* Call correspoding command function */
+  if (!strcmp(command_tokens[0], "globalDiseaseStats")) {
+    printf("globalDiseaseStats command\n");
+  } else if (!strcmp(command_tokens[0], "diseaseFrequency")) {
+    printf("diseaseFrequency command\n");
+  } else if (!strcmp(command_tokens[0], "topk-Diseases")) {
+    printf("topk-Diseases command\n");
+  } else if (!strcmp(command_tokens[0], "topk-Countries")) {
+    printf("topk-Countries command");
+  } else if (!strcmp(command_tokens[0], "insertPatientRecord")) {
+    printf("insertPatientRecord command\n");
+  } else if (!strcmp(command_tokens[0], "recordPatientExit")) {
+    printf("recordPatientExit command\n");
+  } else if (!strcmp(command_tokens[0], "numCurrentPatients")) {
+    printf("numCurrentPatients command\n");
+  } else if (!strcmp(command_tokens[0], "exit")) {
+    printf("exit command\n");
+    command_code = EXIT;
+  } else {
+    report_warning("Unknown command: <%s>.", command);
+  }
+  /* Free wordexp object */
+  wordfree(&p);
+  /* Return command code */
+  return command_code;
 }
 
 static void __report(const char* tag, const char* fmt, va_list args) {

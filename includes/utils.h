@@ -28,17 +28,4 @@
   /* Free a pointer to char */
   void destroy_string(void*);
 
-  /* Tokenizes a string given a delimiter and returns the tokens to an array */
-  void tokenize_string(char*, char[], char**);
-  /* Returns the number of tokens of a string given its delimiter */
-  size_t count_tokens(char*, char[]);
-
-
-  typedef struct test_t {
-    int a;
-    int b;
-  } test_t;
-
-  typedef test_t* test_ptr;
-
 #endif

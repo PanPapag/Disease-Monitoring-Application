@@ -43,22 +43,3 @@ void destroy_string(void *v) {
   char* s = (char *)v;
   free(s);
 }
-
-void tokenize_string(char* value, char delimiter[], char **res) {
-  int i = 0;
-  char* token = strtok(value, " ");
-  while (token != NULL) {
-    res[i++] = token;
-    token = strtok(NULL, " ");
-  }
-}
-
-size_t count_tokens(char* value, char delimiter[]) {
-  size_t cnt = 0;
-  char* token = strtok(value, " ");
-  while (token != NULL) {
-    cnt++;
-    token = strtok(NULL, " ");
-  }
-  return cnt;
-}
