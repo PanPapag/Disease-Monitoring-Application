@@ -63,7 +63,7 @@ patient_record_ptr patient_record_create(char** patient_record_tokens) {
   return patient_record;
 }
 
-void patient_record_print(FILE* out, void* v) {
+void patient_record_print(void* v, FILE* out) {
   patient_record_ptr patient_record = (patient_record_ptr *) v;
   char entry_date_buffer[BUFFER_SIZE];
   char exit_date_buffer[BUFFER_SIZE];

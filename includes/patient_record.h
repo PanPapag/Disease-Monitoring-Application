@@ -37,7 +37,7 @@
   */
   patient_record_ptr patient_record_create(char**);
   /* Utility function to print a patient record struct */
-  void patient_record_print(FILE*, void*);
+  void patient_record_print(void*, FILE*);
   /* Utility function to compare two patient record structs */
   int patient_record_compare(void*, void*);
   /* Utility function to delete an allocated patient record struct */

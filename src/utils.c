@@ -31,7 +31,7 @@ size_t hash_string(void* value) {
   return hash;
 }
 
-void print_string(FILE* out, void* v) {
+void print_string(void* v, FILE* out) {
   fprintf(out, "%s\n", (char*) v);
 }
 

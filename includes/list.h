@@ -20,14 +20,14 @@
       size_t size_;
       size_t data_size_;
       int (*list_cmp_func_)(void*, void*);
-      void (*list_print_func_)(FILE*, void*);
+      void (*list_print_func_)(void*, FILE*);
       void (*list_data_delete_func_)(void*);
   } list_t;
 
   /* Creates a new list given a type, compare and print functions */
   #define list_create(t, cf, pf, df) __list_create(sizeof(t), cf, pf, df)
   list_ptr __list_create(size_t, int (*)(void*, void*),
-                         void (*)(FILE*, void*), void (*)(void*));
+                         void (*)(void*, FILE*), void (*)(void*));
 
   /* Deletes list */
   void list_clear(list_ptr);

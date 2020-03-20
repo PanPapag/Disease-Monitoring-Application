@@ -9,7 +9,7 @@
 
 avl_ptr __avl_create(size_t data_size,
                      int (*avl_cmp_func)(void*, void*),
-                     void (*avl_print_func)(FILE*, void*)) {
+                     void (*avl_print_func)(void*, FILE*)) {
 
   avl_ptr avl = malloc(sizeof(*avl));
   if (avl == NULL) {
@@ -21,16 +21,6 @@ avl_ptr __avl_create(size_t data_size,
   avl->avl_cmp_func_ = avl_cmp_func;
   avl->avl_print_func_ = avl_print_func;
   return avl;
-}
-
-void __avl_clear(avl_node_ptr temp) {
-  if (temp == NULL)
-    return;
-
-  __avl_clear(temp->left_);
-  __avl_clear(temp->right_);
-
-  free(temp);
 }
 
 static inline
@@ -247,11 +237,36 @@ avl_node_ptr avl_find(avl_ptr avl, void* data) {
   return NULL;
 }
 
+static inline
 void __avl_print_inorder(avl_ptr avl, avl_node_ptr current_root, FILE* out) {
   avl_node_ptr temp = current_root;
   if (temp != NULL) {
     __avl_print_inorder(avl, temp->left_, out);
-    avl->avl_print_func_(out, temp->data_);
+    avl->avl_print_func_(temp->data_, out);
     __avl_print_inorder(avl, temp->right_, out);
+  }
+}
+
+void avl_print_inorder(void* v, FILE* out) {
+  avl_ptr avl = (avl_ptr) v;
+  __avl_print_inorder(avl, avl->root_, out);
+}
+
+static inline
+void __avl_clear(avl_node_ptr temp) {
+  if (temp == NULL)
+    return;
+
+  __avl_clear(temp->left_);
+  __avl_clear(temp->right_);
+
+  __FREE(temp);
+}
+
+void avl_clear(void* v) {
+  avl_ptr avl = (avl_ptr) v;
+  if (avl != NULL) {
+    __avl_clear(avl->root_);
+    __FREE(avl);
   }
 }

@@ -29,8 +29,8 @@
     list_ptr* table_;
     size_t (*ht_hash_func_)(const void*);
     int (*ht_key_cmp_func_)(void*, void*);
-    void (*ht_key_print_func_)(FILE*, void*);
-    void (*ht_value_print_func_)(FILE*, void*);
+    void (*ht_key_print_func_)(void*, FILE*);
+    void (*ht_value_print_func_)(void*, FILE*);
     void (*ht_key_delete_func_)(void*);
     void (*ht_value_delete_func_)(void*);
   } hash_table_t;
@@ -41,7 +41,7 @@
   */
   hash_table_ptr hash_table_create(size_t, size_t,
     size_t (*)(const void*), int (*)(void*, void*),
-    void (*)(FILE*, void*), void (*)(FILE*, void*),
+    void (*)(void*, FILE*), void (*)(void*, FILE*),
     void (*)(void*), void (*)(void*));
 
   /* Deletes hash table */

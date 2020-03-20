@@ -78,12 +78,12 @@ void __bucket_print(hash_table_ptr hash_table, bucket_ptr bucket, FILE* out) {
     if (bucket->table_[i].key_ != NULL) {
       if (hash_table->ht_key_print_func_ != NULL) {
         printf("------------ KEY ------------\n");
-        hash_table->ht_key_print_func_(out, bucket->table_[i].key_);
+        hash_table->ht_key_print_func_(bucket->table_[i].key_, out);
         printf("-----------------------------\n");
       }
       if (hash_table->ht_value_print_func_ != NULL) {
         printf("----------- VALUE -----------\n");
-        hash_table->ht_value_print_func_(out, bucket->table_[i].value_);
+        hash_table->ht_value_print_func_(bucket->table_[i].value_, out);
         printf("-----------------------------\n");
       }
     }
@@ -93,8 +93,8 @@ void __bucket_print(hash_table_ptr hash_table, bucket_ptr bucket, FILE* out) {
 hash_table_ptr hash_table_create(size_t ht_entries, size_t bucket_size,
                                  size_t (*hash_func)(const void*),
                                  int (*key_cmp_func)(void*, void*),
-                                 void (*key_print_func)(FILE*, void*),
-                                 void (*value_print_func)(FILE*, void*),
+                                 void (*key_print_func)(void*, FILE*),
+                                 void (*value_print_func)(void*, FILE*),
                                  void (*key_delete_func)(void*),
                                  void (*value_delete_func)(void*)) {
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../includes/avl.h"
 #include "../includes/macros.h"
 #include "../includes/hash_table.h"
 #include "../includes/patient_record.h"
@@ -10,6 +11,16 @@
 program_parameters_t parameters;
 
 extern hash_table_ptr patient_record_ht;
+
+int cmp(void *a, void *b) {
+	int v = *((int *) a);
+	int w = *((int *) b);
+	return v - w;
+}
+
+void print(void *v, FILE *out) {
+	fprintf(out, "%d\n", *((int *)v));
+}
 
 int main(int argc, char* argv[]) {
   srandom((unsigned int) ((time(NULL) ^ (intptr_t) printf) & (intptr_t) main));
@@ -24,11 +35,11 @@ int main(int argc, char* argv[]) {
   read_patient_records_file_and_update_structures();
   main_loop();
   /* Create Disease Hash Table */
-  // hash_table_ptr disease_ht = hash_table_create(parameters.ht_disease_size,
-  //                                               parameters.bucket_size,
-  //                                               hash_string, compare_string,
-  //                                               print_string, patient_record_print,
-  //                                               NULL, patient_record_delete);
+  hash_table_ptr disease_ht = hash_table_create(parameters.ht_disease_size,
+                                                parameters.bucket_size,
+                                                hash_string, compare_string,
+                                                print_string, avl_print_inorder,
+                                                NULL, avl_clear);
   /* Create Country Hash Table */ /*
   hash_table_ptr country_ht = hash_table_create(char*, avl_ptr,
                                                 parameters.ht_disease_size,
@@ -41,7 +52,8 @@ int main(int argc, char* argv[]) {
 
   hash_table_print(patient_record_ht, stdout);
 
-
+	hash_table_clear(disease_ht);
   hash_table_clear(patient_record_ht);
+
   return EXIT_SUCCESS;
 }

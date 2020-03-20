@@ -7,7 +7,7 @@
 
 list_ptr __list_create(size_t data_size,
                        int (*list_cmp_func)(void*, void*),
-                       void (*list_print_func)(FILE*, void*),
+                       void (*list_print_func)(void*, FILE*),
                        void (*list_data_delete_func)(void*)) {
 
   list_ptr list = malloc(sizeof(*list));
