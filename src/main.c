@@ -18,20 +18,17 @@ int main(int argc, char* argv[]) {
   size_t no_buckets = MAX(parameters.ht_disease_size, parameters.ht_country_size);
   /* patient_record_ht: record id --> pointer to patient record structure */
   patient_record_ht = hash_table_create(no_buckets, parameters.bucket_size,
-                                        hash_string,
-                                        compare_string, patient_record_compare,
+                                        hash_string, compare_string,
                                         print_string, patient_record_print,
                                         NULL, patient_record_delete);
   read_patient_records_file_and_update_structures();
   main_loop();
-  /* Create Disease Hash Table */ /*
-  hash_table_ptr disease_ht = hash_table_create(char*, avl_ptr,
-                                                parameters.ht_disease_size,
-                                                parameters.bucket_size,
-                                                NULL, //TODO HASH F
-                                                patient_record_compare,
-                                                NULL, // TOSO PRINT CHAR*
-                                                patient_record_print);
+  /* Create Disease Hash Table */
+  // hash_table_ptr disease_ht = hash_table_create(parameters.ht_disease_size,
+  //                                               parameters.bucket_size,
+  //                                               hash_string, compare_string,
+  //                                               print_string, patient_record_print,
+  //                                               NULL, patient_record_delete);
   /* Create Country Hash Table */ /*
   hash_table_ptr country_ht = hash_table_create(char*, avl_ptr,
                                                 parameters.ht_disease_size,

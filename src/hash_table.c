@@ -93,7 +93,6 @@ void __bucket_print(hash_table_ptr hash_table, bucket_ptr bucket, FILE* out) {
 hash_table_ptr hash_table_create(size_t ht_entries, size_t bucket_size,
                                  size_t (*hash_func)(const void*),
                                  int (*key_cmp_func)(void*, void*),
-                                 int (*value_cmp_func)(void*, void*),
                                  void (*key_print_func)(FILE*, void*),
                                  void (*value_print_func)(FILE*, void*),
                                  void (*key_delete_func)(void*),
@@ -111,7 +110,6 @@ hash_table_ptr hash_table_create(size_t ht_entries, size_t bucket_size,
   hash_table->bucket_entries_ = bucket_size / 16;
   hash_table->ht_hash_func_ = hash_func;
   hash_table->ht_key_cmp_func_ = key_cmp_func;
-  hash_table->ht_value_cmp_func_ = value_cmp_func;
   hash_table->ht_key_print_func_ = key_print_func;
   hash_table->ht_value_print_func_ = value_print_func;
   hash_table->ht_key_delete_func_ = key_delete_func;
@@ -122,7 +120,7 @@ hash_table_ptr hash_table_create(size_t ht_entries, size_t bucket_size,
     exit(EXIT_FAILURE);
   }
   for (size_t i = 0U; i != ht_entries; ++i) {
-    hash_table->table_[i] = list_create(bucket_ptr, value_cmp_func, value_print_func, NULL);
+    hash_table->table_[i] = list_create(bucket_ptr, NULL, NULL, NULL);
     bucket_ptr bucket = __bucket_create(hash_table, hash_table->bucket_entries_);
     list_push_front(&hash_table->table_[i], &bucket);
   }

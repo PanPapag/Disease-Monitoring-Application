@@ -47,4 +47,7 @@
   */
   int64_t compare_date(char*, char*);
 
+  /* Given an array of strings it returns the same array without the first string */
+  char** prune_command_name(char**, size_t);
+
 #endif

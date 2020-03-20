@@ -2,8 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../includes/avl.h"
 #include "../includes/commands.h"
+#include "../includes/hash_table.h"
 #include "../includes/utils.h"
+#include "../includes/patient_record.h"
+
+hash_table_ptr patient_record_ht;
 
 int validate_global_disease_stats(int argc, char** argv) {
   if (argc != 1 && argc != 3) {
@@ -183,6 +188,22 @@ int validate_insert_patient_record(int argc, char** argv) {
     }
   }
   return VALID_COMMAND;
+}
+
+void execute_insert_patient_record(int argc, char** argv) {
+  patient_record_ptr patient_record = patient_record_create(argv);
+  void* result = hash_table_find(patient_record_ht, patient_record->record_id);
+  /* If record Id not found */
+  if (result == NULL) {
+    /* Update patient record hash table */
+    hash_table_insert(&patient_record_ht, patient_record->record_id, patient_record);
+    /* Update disease hash table */
+
+    /* Update country hash table */
+  } else {
+    report_warning("Patient record with Record ID: <%s> already exists. "
+                   "Discarding patient record.", patient_record->record_id);
+  }
 }
 
 int validate_record_patient_exit(int argc, char** argv) {

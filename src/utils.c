@@ -118,3 +118,11 @@ int64_t compare_date(char* date1, char* date2) {
   // Return the difference
   return date1_to_secs - date2_to_secs;
 }
+
+char** prune_command_name(char** src, size_t size) {
+  char** dest = (char**) malloc((size - 1) * sizeof(char*));
+  for (size_t i = 1; i < size; ++i) {
+    *(dest + i - 1) = src[i];
+  }
+  return dest;
+}

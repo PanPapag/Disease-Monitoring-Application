@@ -14,8 +14,6 @@
 
 program_parameters_t parameters;
 
-hash_table_ptr patient_record_ht;
-
 static struct option options[] = {
       {"p",    required_argument, NULL, 'p'},
       {"h1",   required_argument, NULL, 'd'},
@@ -108,18 +106,7 @@ void read_patient_records_file_and_update_structures() {
     /* Check patient record tokens' validity */
     int code = validate_patient_record_tokens(patient_record_tokens);
     if (code == VALID_PATIENT_RECORD) {
-      /* Create a new patient record */
-      patient_record_ptr patient_record = patient_record_create(patient_record_tokens);
-      int res = hash_table_insert(&patient_record_ht, patient_record->record_id, patient_record);
-      if (res == SUCCESS) {
-        /* Update disease hash table */
-        //printf("TODO\n");
-        int temp = 1;
-        /* Update country hash table */
-      } else {
-        report_warning("Patient record with Record ID: <%s> already exists. "
-                       "Discarding patient record.", patient_record->record_id);
-      }
+      execute_insert_patient_record(NO_PATIENT_RECORD_TOKENS, patient_record_tokens);
     } else {
       print_patient_record_error(patient_record_tokens, code);
     }
@@ -148,8 +135,10 @@ void main_loop(void) {
 
 int handle_command(char command[]) {
   wordexp_t p;
-  int command_no_tokens;
   char** command_tokens;
+  int command_no_tokens;
+  char** command_argv;
+  int command_argc;
   int command_code = CONTINUE;
   /* Use API POSIX to extract arguments */
   wordexp(command, &p, 0);
@@ -161,42 +150,53 @@ int handle_command(char command[]) {
       printf("EXECUTE\n");
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: globalDiseaseStats [date1 date2]\n");
     }
   } else if (!strcmp(command_tokens[0], "diseaseFrequency")) {
     if (validate_disease_frequency(command_no_tokens, command_tokens)) {
       printf("EXECUTE\n");
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: diseaseFrequency virusName [country] date1 date2\n");
     }
   } else if (!strcmp(command_tokens[0], "topk-Diseases")) {
     if (validate_topk_diseases(command_no_tokens, command_tokens)) {
       printf("EXECUTE\n");
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: topk-Diseases k country [date1 date2]\n");
     }
   } else if (!strcmp(command_tokens[0], "topk-Countries")) {
     if (validate_topk_countries(command_no_tokens, command_tokens)) {
       printf("EXECUTE\n");
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: topk-Countries k disease [date1 date2]\n");
     }
   } else if (!strcmp(command_tokens[0], "insertPatientRecord")) {
     if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
-      printf("EXECUTE\n");
+      command_argv = prune_command_name(command_tokens, command_no_tokens);
+      command_argc = command_tokens - 1;
+      execute_insert_patient_record(command_argc, command_argv);
+      __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: insertPatientRecord recordID patientFirstName "
+                      "patientLastName diseaseID country entryDate [exitDate]\n");
     }
   } else if (!strcmp(command_tokens[0], "recordPatientExit")) {
     if (validate_record_patient_exit(command_no_tokens, command_tokens)) {
       printf("EXECUTE\n");
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: recordPatientExit recordID exitDate\n");
     }
   } else if (!strcmp(command_tokens[0], "numCurrentPatients")) {
     if (validate_num_current_patients(command_no_tokens, command_tokens)) {
       printf("EXECUTE\n");
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: numCurrentPatients [disease]\n");
     }
   } else if (!strcmp(command_tokens[0], "exit")) {
     if (validate_exit(command_no_tokens, command_tokens)) {
@@ -204,10 +204,13 @@ int handle_command(char command[]) {
       command_code = EXIT;
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
+      fprintf(stderr, "Usage: exit\n");
     }
   } else {
     report_warning("Unknown command: <%s>.", command);
   }
+  /* Print new line for better format in the console */
+  printf("\n");
   /* Free wordexp object */
   wordfree(&p);
   /* Return command code */
