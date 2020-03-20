@@ -9,8 +9,6 @@
 #include "../includes/utils.h"
 #include "../includes/patient_record.h"
 
-extern globalf;
-
 hash_table_ptr patient_record_ht;
 hash_table_ptr disease_ht;
 hash_table_ptr country_ht;
@@ -219,14 +217,12 @@ void execute_insert_patient_record(char** argv) {
     /* Search if patient record country exists */
     result = hash_table_find(country_ht, patient_record->country);
     if (result == NULL) {
-      globalf = 1;
       /* If not found create a new AVL tree to store pointers to patient record */
       avl_ptr new_country_avl = avl_create(patient_record_compare,
                                            patient_record_print);
       avl_insert(&new_country_avl, patient_record);
       /* Update country hash table */
       hash_table_insert(&country_ht, patient_record->country, new_country_avl);
-      globalf = 0;
     } else {
       /* Update country hash table by insert patient_record pointer to AVL tree */
       avl_ptr country_avl = (avl_ptr) result;
@@ -276,10 +272,6 @@ int validate_exit(int argc, char** argv) {
 }
 
 void execute_exit() {
-  hash_table_print(disease_ht, stdout);
-  printf("-------------------------------\n");
-  hash_table_print(country_ht, stdout);
-
   /* Free all memory allocated by the program */
   hash_table_clear(patient_record_ht);
   hash_table_clear(disease_ht);
