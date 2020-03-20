@@ -14,19 +14,17 @@
     avl_node_ptr right_;
     avl_node_ptr parent_;
     int balance_factor_;
-    byte_t data_[];
+    void* data_;
   } avl_node_t;
 
   struct avl_t {
     avl_node_ptr root_;
-    size_t data_size_;
     int (*avl_cmp_func_)(void*, void*);
     void (*avl_print_func_)(void*, FILE*);
   } avl_t;
 
   /* Creates a new avl tree given a type, compare and print functions */
-  #define avl_create(t, dc, dp) __avl_create(sizeof(t), dc, dp)
-  avl_ptr __avl_create(size_t, int (*)(void*, void*), void (*)(void*, FILE*));
+  avl_ptr avl_create(int (*)(void*, void*), void (*)(void*, FILE*));
 
   /* Generic Purpose Delete Function of AVL Tree */
   void avl_clear(void*);

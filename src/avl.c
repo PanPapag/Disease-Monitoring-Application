@@ -7,9 +7,8 @@
 #include "../includes/io_utils.h"
 #include "../includes/utils.h"
 
-avl_ptr __avl_create(size_t data_size,
-                     int (*avl_cmp_func)(void*, void*),
-                     void (*avl_print_func)(void*, FILE*)) {
+avl_ptr avl_create(int (*avl_cmp_func)(void*, void*),
+                   void (*avl_print_func)(void*, FILE*)) {
 
   avl_ptr avl = malloc(sizeof(*avl));
   if (avl == NULL) {
@@ -17,7 +16,6 @@ avl_ptr __avl_create(size_t data_size,
     exit(EXIT_FAILURE);
   }
   avl->root_ = NULL;
-  avl->data_size_ = data_size;
   avl->avl_cmp_func_ = avl_cmp_func;
   avl->avl_print_func_ = avl_print_func;
   return avl;
@@ -158,12 +156,12 @@ void avl_insert(avl_ptr* avl, void* new_data) {
   /* Allocate and initialize a new avl node */
   // + data_size means that the size of the variable-length
   // array 'data' of the node will be of size data_size.
-  avl_node_ptr new_node = (avl_node_ptr) malloc(sizeof(avl_node_t) + (*avl)->data_size_);
+  avl_node_ptr new_node = (avl_node_ptr) malloc(sizeof(avl_node_t));
   if (new_node == NULL) {
     report_error("Could not allocate memory for AVL Node. Exiting...");
     exit(EXIT_FAILURE);
   }
-  memcpy(new_node->data_, new_data, (*avl)->data_size_);
+  new_node->data_ = new_data;
   /* Traverse avl tree to find the correct position to insert the new node */
   avl_node_ptr current = (*avl)->root_;
   avl_node_ptr parent = NULL;

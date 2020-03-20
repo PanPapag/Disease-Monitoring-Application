@@ -199,9 +199,34 @@ void execute_insert_patient_record(char** argv) {
   if (result == NULL) {
     /* Update patient record hash table */
     hash_table_insert(&patient_record_ht, patient_record->record_id, patient_record);
-    /* Update disease hash table */
-
-    /* Update country hash table */
+    /* Search if patient record disease id exists */
+    result = hash_table_find(disease_ht, patient_record->disease_id);
+    if (result == NULL) {
+      /* If not found create a new AVL tree to store pointers to patient record */
+      avl_ptr new_disease_avl = avl_create(patient_record_compare,
+                                           patient_record_print);
+      avl_insert(&new_disease_avl, patient_record);
+      /* Update disease hash table */
+      hash_table_insert(&disease_ht, patient_record->disease_id, new_disease_avl);
+    } else {
+      /* Update disease hash table by insert patient_record pointer to AVL tree */
+      avl_ptr disease_avl = (avl_ptr) result;
+      avl_insert(&disease_avl, patient_record);
+    }
+    /* Search if patient record country exists */
+    result = hash_table_find(country_ht, patient_record->country);
+    if (result == NULL) {
+      /* If not found create a new AVL tree to store pointers to patient record */
+      avl_ptr new_country_avl = avl_create(patient_record_compare,
+                                           patient_record_print);
+      avl_insert(&new_country_avl, patient_record);
+      /* Update country hash table */
+      hash_table_insert(&country_ht, patient_record->country, new_country_avl);
+    } else {
+      /* Update country hash table by insert patient_record pointer to AVL tree */
+      avl_ptr country_avl = (avl_ptr) result;
+      avl_insert(&country_avl, patient_record);
+    }
   } else {
     report_warning("Patient record with Record ID: <%s> already exists. "
                    "Discarding patient record.", patient_record->record_id);
