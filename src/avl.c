@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +17,7 @@ avl_ptr avl_create(int (*avl_cmp_func)(void*, void*),
     exit(EXIT_FAILURE);
   }
   avl->root_ = NULL;
+  avl->size_ = 0U;
   avl->avl_cmp_func_ = avl_cmp_func;
   avl->avl_print_func_ = avl_print_func;
   return avl;
@@ -45,10 +47,10 @@ avl_node_ptr __rotate_ll(avl_node_ptr parent, int parent_factor,
     }
   }
   *child_factor = (MAX(c_right, p_right) + 1) - c_left;
-  parent->balance_factor_ =  p_right - c_right;
+  parent->balance_factor_ = p_right - c_right + 1;
   parent->left_ = child->right_;
   if (child->right_) {
-    child->right_->parent_ =  parent;
+    child->right_->parent_ = parent;
   }
   child->right_ = parent;
   child->parent_ = parent->parent_;
@@ -80,14 +82,14 @@ avl_node_ptr __rotate_rr(avl_node_ptr parent, int parent_factor,
     }
   }
   *child_factor = c_right - (MAX(c_left, p_left) + 1);
-  parent->balance_factor_ += c_left - p_left;
+  parent->balance_factor_ = c_left - p_left + 1;
   parent->right_ = child->left_;
   if (child->left_) {
     child->left_->parent_ = parent;
   }
   child->left_ = parent;
-  child->parent_ =  parent->parent_;
-  parent->parent_ =  child;
+  child->parent_ = parent->parent_;
+  parent->parent_ = child;
   return child;
 }
 
@@ -103,7 +105,7 @@ avl_node_ptr __rotate_lr(avl_node_ptr parent, int parent_factor) {
     child_factor = child->balance_factor_;
   }
   avl_node_ptr res = __rotate_ll(parent, parent_factor - h_delta, &child_factor, NULL);
-  res->balance_factor_ += child_factor;
+  res->balance_factor_ = child_factor + 1;
   return res;
 }
 
@@ -116,13 +118,12 @@ avl_node_ptr __rotate_rl(avl_node_ptr parent, int parent_factor) {
     child_factor = child->left_->balance_factor_;
     parent->right_ = __rotate_ll(child, child->balance_factor_, &child_factor, &h_delta);
   } else {
-    child_factor = child->left_->balance_factor_;
+    child_factor = child->balance_factor_;
   }
   avl_node_ptr res = __rotate_rr(parent, parent_factor + h_delta, &child_factor, NULL);
-  res->balance_factor_ += child_factor;
+  res->balance_factor_ = child_factor + 1;
   return res;
 }
-
 
 static avl_node_ptr __fix_balance(avl_node_ptr node, int balance_factor) {
   int h_delta = node->balance_factor_ + balance_factor;
@@ -133,7 +134,7 @@ static avl_node_ptr __fix_balance(avl_node_ptr node, int balance_factor) {
       if (node->left_->balance_factor_ <= 0) {
         child_factor = node->left_->balance_factor_;
         node = __rotate_ll(node, h_delta, &child_factor, NULL);
-        node->balance_factor_ = child_factor;
+        node->balance_factor_ = child_factor + 1;
       } else {
         node = __rotate_lr(node, h_delta);
       }
@@ -141,12 +142,12 @@ static avl_node_ptr __fix_balance(avl_node_ptr node, int balance_factor) {
       if (node->right_->balance_factor_ >= 0) {
         child_factor = node->right_->balance_factor_;
         node = __rotate_rr(node, h_delta, &child_factor, NULL);
-        node->balance_factor_ = child_factor;
+        node->balance_factor_ = child_factor + 1;
       } else {
         node = __rotate_rl(node, h_delta);
       }
     } else {
-      node->balance_factor_ += balance_factor;
+      node->balance_factor_ += balance_factor + 1;
     }
   }
   return node;
@@ -166,12 +167,12 @@ void avl_insert(avl_ptr* avl, void* new_data) {
   avl_node_ptr current = (*avl)->root_;
   avl_node_ptr parent = NULL;
   while (current != NULL) {
-    int cmp_res = (*avl)->avl_cmp_func_(new_node->data_, (*avl)->root_->data_);
+    int64_t cmp_res = (*avl)->avl_cmp_func_(current->data_, new_node->data_);
     parent = current;
     if (cmp_res <= 0) {
-      current = current->left_;
-    } else {
       current = current->right_;
+    } else {
+      current = current->left_;
     }
   }
   /* Update the members of the new avl node */
@@ -179,10 +180,11 @@ void avl_insert(avl_ptr* avl, void* new_data) {
   new_node->right_ = new_node->left_ = NULL;
   new_node->balance_factor_ = 1;
   if (parent != NULL) {
-    if ((*avl)->avl_cmp_func_(new_node->data_, parent->data_) < 0) {
-      parent->left_ = new_node;
-    } else {
+    int64_t cmp_res = (*avl)->avl_cmp_func_(parent->data_, new_node->data_);
+    if (cmp_res <= 0) {
       parent->right_ = new_node;
+    } else {
+      parent->left_ = new_node;
     }
   } else {
     (*avl)->root_ = new_node;
@@ -218,6 +220,8 @@ void avl_insert(avl_ptr* avl, void* new_data) {
     if (balance_factor == 0) break;
     new_node = parent;
   }
+  /* Increase number of inserted items in AVL */
+  (*avl)->size_++;
 }
 
 avl_node_ptr avl_find(avl_ptr avl, void* data) {

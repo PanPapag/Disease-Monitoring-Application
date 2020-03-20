@@ -83,7 +83,7 @@ void patient_record_print(void* v, FILE* out) {
   printf("\n");
 }
 
-int patient_record_compare(void* a, void* b) {
+int64_t patient_record_compare(void* a, void* b) {
 	patient_record_ptr pr1 = (patient_record_ptr *) a;
 	patient_record_ptr pr2 = (patient_record_ptr *) b;
   char pr1_entry_date_buffer[BUFFER_SIZE];

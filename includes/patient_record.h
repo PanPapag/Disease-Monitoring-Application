@@ -1,6 +1,7 @@
 #ifndef __PATIENT_RECORD__
   #define __PATIENT_RECORD__
 
+  #include <stdint.h>
   #include <time.h>
 
   #define NO_PATIENT_RECORD_TOKENS 7
@@ -39,7 +40,7 @@
   /* Utility function to print a patient record struct */
   void patient_record_print(void*, FILE*);
   /* Utility function to compare two patient record structs */
-  int patient_record_compare(void*, void*);
+  int64_t patient_record_compare(void*, void*);
   /* Utility function to delete an allocated patient record struct */
   void patient_record_delete(void*);
 

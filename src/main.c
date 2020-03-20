@@ -13,14 +13,18 @@ extern hash_table_ptr patient_record_ht;
 extern hash_table_ptr disease_ht;
 extern hash_table_ptr country_ht;
 
-int cmp(void *a, void *b) {
-	int v = *((int *) a);
-	int w = *((int *) b);
-	return v - w;
+int* create_int(int value) {
+	int* p = malloc(sizeof(int));
+	*p = value;
+	return p;
 }
 
-void print(void *v, FILE *out) {
-	fprintf(out, "%d\n", *((int *)v));
+int compare_ints(void* a, void* b) {
+	return *(int*)a - *(int*)b;
+}
+
+void print_int(void *v, FILE *out) {
+	fprintf(out, "%d\n", (*(int *)v));
 }
 
 int main(int argc, char* argv[]) {
@@ -47,12 +51,32 @@ int main(int argc, char* argv[]) {
                                  NULL, avl_clear);
   /* Read patient Record File and Update all Data Structures */
 	read_patient_records_file_and_update_structures();
-
-	/* DEBUG Purposes */
-	// hash_table_print(patient_record_ht, stdout);
-
 	/* Execute the app until command exit is given */
   main_loop();
+	/* DEBUG Purposes */
+	//
+	// avl_ptr avl = avl_create(compare_ints, print_int);
+	//
+	// int N = 10000;
+	//
+	// int* value_array[N];
+	//
+	// // Δοκιμάζουμε την insert με νέες τιμές κάθε φορά και με αυτόματο free
+	// for (int i = 0; i < N; i++) {
+	//
+	// 	value_array[i] = create_int(i);
+	//
+	// 	avl_insert(&avl, value_array[i]);
+	// }
+	//
+	// printf("----------PRINT AVL --------\n");
+	// avl_print_inorder(avl, stdout);
+	//
+	// avl_node_ptr res_avl = avl_find(avl, value_array[0]);
+	// printf("FOUND: %d -> %d correct\n",*((int *)res_avl->data_), *value_array[0]);
+	//
+	// avl_clear(avl);
+
   /* Everything find return EXIT_SUCCESS */
   return EXIT_SUCCESS;
 }

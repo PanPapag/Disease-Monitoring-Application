@@ -49,8 +49,10 @@
 
   /* Adds a pair of (key, value) to the hash table */
   int hash_table_insert(hash_table_ptr*, void*, void*);
+
   /* Given a key returns the value associated with it. NULL if not found */
   void* hash_table_find(hash_table_ptr, void*);
+  
   /* Utility function to print the whole hash table */
   void hash_table_print(hash_table_ptr, FILE*);
 

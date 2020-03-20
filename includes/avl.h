@@ -19,6 +19,7 @@
 
   struct avl_t {
     avl_node_ptr root_;
+    size_t size_;
     int (*avl_cmp_func_)(void*, void*);
     void (*avl_print_func_)(void*, FILE*);
   } avl_t;

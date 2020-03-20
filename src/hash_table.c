@@ -6,6 +6,8 @@
 #include "../includes/io_utils.h"
 #include "../includes/utils.h"
 
+int globalf;
+
 static inline
 bucket_ptr __bucket_create(hash_table_ptr hash_table, size_t bucket_entries) {
   bucket_ptr bucket = (bucket_ptr) malloc(sizeof(*bucket));
@@ -172,6 +174,9 @@ void* hash_table_find(hash_table_ptr hash_table, void* key) {
   size_t pos = hash_table->ht_hash_func_(key) % hash_table->ht_entries_;
   list_ptr entry_bucket_chain = hash_table->table_[pos];
   size_t entry_no_buckets = list_size(entry_bucket_chain);
+  if (globalf) {
+    printf("%s - %d - size: %d\n", (char*)key, pos, entry_no_buckets);
+  }
   for (size_t i = 1U; i <= entry_no_buckets; ++i) {
     list_node_ptr list_node = list_get(entry_bucket_chain, i);
     if (list_node == NULL) {
