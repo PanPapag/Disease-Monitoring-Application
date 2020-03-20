@@ -13,6 +13,8 @@ hash_table_ptr patient_record_ht;
 hash_table_ptr disease_ht;
 hash_table_ptr country_ht;
 
+list_ptr diseases_names;
+
 int validate_global_disease_stats(int argc, char** argv) {
   if (argc != 1 && argc != 3) {
     return INVALID_COMMAND;
@@ -203,6 +205,8 @@ void execute_insert_patient_record(char** argv) {
     /* Search if patient record disease id exists */
     result = hash_table_find(disease_ht, patient_record->disease_id);
     if (result == NULL) {
+      /* Store disease to global diseases_names list */
+      list_push_front(&diseases_names, &patient_record->disease_id);
       /* If not found create a new AVL tree to store pointers to patient record */
       avl_ptr new_disease_avl = avl_create(patient_record_compare,
                                            patient_record_print);
@@ -251,6 +255,33 @@ int validate_record_patient_exit(int argc, char** argv) {
   return VALID_COMMAND;
 }
 
+void execute_record_patient_exit(char** argv) {
+  /* Search if patient record country exists */
+  void* result = hash_table_find(patient_record_ht, argv[0]);
+  if (result == NULL) {
+    report_warning("Patient record with Record ID: <%s> not found.", argv[0]);
+  } else {
+    // Cast result to patient record pointer
+    patient_record_ptr patient_record = (patient_record_ptr) result;
+    /* Convert struct tm to buffer */
+    char exit_date_buffer[BUFFER_SIZE];
+    strftime(exit_date_buffer, sizeof(exit_date_buffer), "%d-%m-%Y", &patient_record->exit_date);
+    /* Check if exit date is not specified */
+    if (!strcmp(exit_date_buffer, EXIT_DATE_NOT_SPECIFIED)) {
+      // Update exit day of patient record with the given record id
+      memset(&patient_record->exit_date, 0, sizeof(struct tm));
+      strptime(argv[1], "%d-%m-%Y", &patient_record->exit_date);
+      // Print success message
+      printf("\nCommand <recordPatientExit> executed.\n");
+      printf("Patient record with Record ID: <%s> updated successfully.\n\n", argv[0]);
+      patient_record_print(patient_record, stdout);
+    } else {
+      report_warning("Patient record Exit Date with Record ID: "
+                     "<%s> is already specified.", argv[0]);
+    }
+  }
+}
+
 int validate_num_current_patients(int argc, char** argv) {
   if (argc != 1 && argc != 2) {
     return INVALID_COMMAND;
@@ -267,13 +298,64 @@ int validate_num_current_patients(int argc, char** argv) {
   return VALID_COMMAND;
 }
 
+static inline
+int __count_current_patients(avl_node_ptr current_root, int* counter) {
+  avl_node_ptr temp = current_root;
+  if (temp != NULL) {
+    __count_current_patients(temp->left_, counter);
+    // TODO fix condition
+    (*counter)++;
+    __count_current_patients(temp->right_, counter);
+  }
+}
+
+static inline
+int __num_current_patients_util(char* disease_id) {
+  int counter = 0;
+  /* Get for the current disease its AVL tree */
+  void* result = hash_table_find(disease_ht, disease_id);
+  /* Cast result to avl pointer */
+  avl_ptr disease_avl = (avl_ptr) result;
+  /*
+    Traverse inorder AVL and each time a patient record with unspecified exit
+    date is found increase the counter for current patients
+  */
+   __count_current_patients(disease_avl->root_, &counter);
+  return counter;
+}
+
+void execute_num_current_patients(int argc, char** argv) {
+  printf("\nCommand <numCurrentPatients> executed.\n\n");
+  if (argc == 0) {
+    /* Print for every disease the number of patients that are still in hospital */
+    for (size_t i = 1U; i <= list_size(diseases_names); ++i) {
+      /* Get every disease id */
+      list_node_ptr list_node = list_get(diseases_names, i);
+      char* disease_id = (*(char**) list_node->data_);
+      /* Execute main algorithm to find number of current patients */
+      int no_current_patients = __num_current_patients_util(disease_id);
+      printf("Disease: <%s> - Number of current patients: <%d>\n",
+             disease_id, no_current_patients);
+    }
+  } else {
+    /* Execute main algorithm to find number of current patients */
+    int no_current_patients = __num_current_patients_util(argv[0]);
+    printf("Disease: <%s> - Number of current patients: <%d>\n",
+           argv[0], no_current_patients);
+  }
+  /* Print a new line for better output format in console */
+  printf("\n");
+}
+
 int validate_exit(int argc, char** argv) {
   return argc == 1 ? VALID_COMMAND : INVALID_COMMAND;
 }
 
 void execute_exit() {
+  hash_table_print(disease_ht, stdout);
   /* Free all memory allocated by the program */
   hash_table_clear(patient_record_ht);
   hash_table_clear(disease_ht);
   hash_table_clear(country_ht);
+  list_clear(diseases_names);
 }

@@ -13,6 +13,8 @@ extern hash_table_ptr patient_record_ht;
 extern hash_table_ptr disease_ht;
 extern hash_table_ptr country_ht;
 
+extern list_ptr diseases_names;
+
 int* create_int(int value) {
 	int* p = malloc(sizeof(int));
 	*p = value;
@@ -49,6 +51,8 @@ int main(int argc, char* argv[]) {
                                  hash_string, compare_string,
                                  print_string, avl_print_inorder,
                                  NULL, avl_clear);
+	/* Initialize a list to store all disease names */
+	diseases_names = list_create(STRING*, print_string, compare_string, NULL);
   /* Read patient Record File and Update all Data Structures */
 	read_patient_records_file_and_update_structures();
 	/* Execute the app until command exit is given */

@@ -42,8 +42,10 @@ int compare_string(void* v, void* w) {
 }
 
 void destroy_string(void *v) {
-  char* s = (char *)v;
-  free(s);
+  if (v != NULL) {
+    char* s = (char *)v;
+    __FREE(s);
+  }
 }
 
 /* DD-MM-YYYY format */

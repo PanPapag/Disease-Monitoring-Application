@@ -185,14 +185,19 @@ int handle_command(char command[]) {
     }
   } else if (!strcmp(command_tokens[0], "recordPatientExit")) {
     if (validate_record_patient_exit(command_no_tokens, command_tokens)) {
-      printf("EXECUTE\n");
+      command_argv = prune_command_name(command_tokens, command_no_tokens);
+      execute_record_patient_exit(command_argv);
+      __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: recordPatientExit recordID exitDate\n");
     }
   } else if (!strcmp(command_tokens[0], "numCurrentPatients")) {
     if (validate_num_current_patients(command_no_tokens, command_tokens)) {
-      printf("EXECUTE\n");
+      command_argv = prune_command_name(command_tokens, command_no_tokens);
+      command_argc = command_no_tokens - 1;
+      execute_num_current_patients(command_argc, command_argv);
+      __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: numCurrentPatients [disease]\n");

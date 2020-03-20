@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../includes/list.h"
+#include "../includes/macros.h"
 #include "../includes/io_utils.h"
 
 list_ptr __list_create(size_t data_size,
@@ -30,12 +31,13 @@ void list_clear(list_ptr list) {
   list_node_ptr next;
   while (current != NULL) {
     next = current->next_;
-    list->list_data_delete_func_(current->data_);
-    free(current);
+    if (list->list_data_delete_func_ != NULL)
+      list->list_data_delete_func_(current->data_);
+    __FREE(current);
     current = next;
   }
   list->head_ = NULL;
-  free(list);
+  __FREE(list);
 }
 
 void list_remove(list_ptr* list, list_node_ptr list_node) {

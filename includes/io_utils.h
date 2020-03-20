@@ -23,5 +23,4 @@
   /* Reports Warning Messages */
   void report_warning(const char *fmt, ...);
 
-
 #endif

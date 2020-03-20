@@ -18,8 +18,10 @@
   void execute_insert_patient_record(char**);
 
   int validate_record_patient_exit(int, char**);
-
+  void execute_record_patient_exit(char**);
+  
   int validate_num_current_patients(int, char**);
+  void execute_num_current_patients(int, char**);
 
   int validate_exit(int, char**);
   void execute_exit(void);
