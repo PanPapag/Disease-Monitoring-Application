@@ -24,7 +24,7 @@ int validate_global_disease_stats(int argc, char** argv) {
   } else {
     char* date1 = argv[1];
     char* date2 = argv[2];
-    if (!is_valid_date(date1) || !is_valid_date(date2))
+    if (!is_valid_date_string(date1) || !is_valid_date_string(date2))
       return INVALID_COMMAND;
   }
   return VALID_COMMAND;
@@ -43,11 +43,11 @@ int validate_disease_frequency(int argc, char** argv) {
       }
       // Check date1
       char* date1 = argv[2];
-      if (!is_valid_date(date1))
+      if (!is_valid_date_string(date1))
         return INVALID_COMMAND;
       // Check date2
       char* date2 = argv[3];
-      if (!is_valid_date(date2))
+      if (!is_valid_date_string(date2))
         return INVALID_COMMAND;
     } else {
       // Check virus name to contain only letters, numbers and possibly '-'
@@ -62,11 +62,11 @@ int validate_disease_frequency(int argc, char** argv) {
         return INVALID_COMMAND;
       // Check date1
       char* date1 = argv[3];
-      if (!is_valid_date(date1))
+      if (!is_valid_date_string(date1))
         return INVALID_COMMAND;
       // Check date2
       char* date2 = argv[4];
-      if (!is_valid_date(date2))
+      if (!is_valid_date_string(date2))
         return INVALID_COMMAND;
     }
   }
@@ -101,11 +101,11 @@ int validate_topk_diseases(int argc, char** argv) {
       }
       // Check date1
       char* date1 = argv[3];
-      if (!is_valid_date(date1))
+      if (!is_valid_date_string(date1))
         return INVALID_COMMAND;
       // Check date2
       char* date2 = argv[4];
-      if (!is_valid_date(date2))
+      if (!is_valid_date_string(date2))
         return INVALID_COMMAND;
     }
   }
@@ -136,11 +136,11 @@ int validate_topk_countries(int argc, char** argv) {
         return INVALID_COMMAND;
       // Check date1
       char* date1 = argv[3];
-      if (!is_valid_date(date1))
+      if (!is_valid_date_string(date1))
         return INVALID_COMMAND;
       // Check date2
       char* date2 = argv[4];
-      if (!is_valid_date(date2))
+      if (!is_valid_date_string(date2))
         return INVALID_COMMAND;
     }
   }
@@ -175,18 +175,18 @@ int validate_insert_patient_record(int argc, char** argv) {
       return INVALID_COMMAND;
     /* entry_date: DD-MM-YYYY format */
     char* entry_date = argv[6];
-    if (!is_valid_date(entry_date))
+    if (!is_valid_date_string(entry_date))
       return INVALID_COMMAND;
     if (argc == 8) {
       /* exit_date: DD-MM-YYYY format or - (not specified) */
       char* exit_date = argv[7];
-      if (!is_valid_date(exit_date) && !is_unspecified_date(exit_date)) {
+      if (!is_valid_date_string(exit_date) && !is_unspecified_date_string(exit_date)) {
         return INVALID_COMMAND;
       }
       else {
-        if (!is_unspecified_date(exit_date)) {
+        if (!is_unspecified_date_string(exit_date)) {
           /* Check if exit date is earlier than the entry date */
-          if (compare_date(entry_date, exit_date) > 0)
+          if (compare_date_strings(entry_date, exit_date) > 0)
             return INVALID_COMMAND;
         }
       }
@@ -248,7 +248,7 @@ int validate_record_patient_exit(int argc, char** argv) {
       return INVALID_COMMAND;
     /* exit_date: DD-MM-YYYY format  */
     char* exit_date = argv[2];
-    if (!is_valid_date(exit_date)) {
+    if (!is_valid_date_string(exit_date)) {
       return INVALID_COMMAND;
     }
   }
@@ -299,52 +299,78 @@ int validate_num_current_patients(int argc, char** argv) {
 }
 
 static inline
-int __count_current_patients(avl_node_ptr current_root, int* counter) {
+int __count_current_patients(avl_node_ptr current_root, int* counter, int flag) {
   avl_node_ptr temp = current_root;
   if (temp != NULL) {
-    __count_current_patients(temp->left_, counter);
-    // TODO fix condition
-    (*counter)++;
-    __count_current_patients(temp->right_, counter);
+    __count_current_patients(temp->left_, counter, flag);
+    patient_record_ptr patient_record = (patient_record_ptr) temp->data_;
+    if (is_unspecified_date_tm(patient_record->exit_date)) {
+      if (flag) {
+        patient_record_print(patient_record, stdout);
+      }
+      (*counter)++;
+    }
+    __count_current_patients(temp->right_, counter, flag);
   }
 }
 
 static inline
-int __num_current_patients_util(char* disease_id) {
+int __num_current_patients_util(avl_ptr disease_avl, char* disease_id, int flag) {
   int counter = 0;
-  /* Get for the current disease its AVL tree */
-  void* result = hash_table_find(disease_ht, disease_id);
-  /* Cast result to avl pointer */
-  avl_ptr disease_avl = (avl_ptr) result;
   /*
-    Traverse inorder AVL and each time a patient record with unspecified exit
-    date is found increase the counter for current patients
+    Traverse inorder the AVL Treeand each time a patient record with unspecified
+    exit date is found increase the counter for current patients
   */
-   __count_current_patients(disease_avl->root_, &counter);
+  printf("--------------------------------------------------------\n");
+  if (flag) {
+    printf("Disease: <%s> - Current patients\n\n", disease_id);
+  }
+   __count_current_patients(disease_avl->root_, &counter, flag);
   return counter;
 }
 
 void execute_num_current_patients(int argc, char** argv) {
   printf("\nCommand <numCurrentPatients> executed.\n\n");
+  printf("--------------------------------------------------------\n");
   if (argc == 0) {
     /* Print for every disease the number of patients that are still in hospital */
     for (size_t i = 1U; i <= list_size(diseases_names); ++i) {
       /* Get every disease id */
       list_node_ptr list_node = list_get(diseases_names, i);
       char* disease_id = (*(char**) list_node->data_);
-      /* Execute main algorithm to find number of current patients */
-      int no_current_patients = __num_current_patients_util(disease_id);
-      printf("Disease: <%s> - Number of current patients: <%d>\n",
-             disease_id, no_current_patients);
+      /* Get for the current disease its AVL tree */
+      void* result = hash_table_find(disease_ht, disease_id);
+      if (result == NULL) {
+        report_warning("There is no disease recorded with Disease ID: <%s>",
+                       disease_id);
+      } else {
+        /* Cast result to avl pointer */
+        avl_ptr disease_avl = (avl_ptr) result;
+        /* Execute main algorithm to print current patients */
+        int no_current_patients = __num_current_patients_util(disease_avl, disease_id, 1);
+        if (no_current_patients == 0) {
+          printf("No are patients are currently affected by <%s>.\n\n",disease_id);
+        }
+      }
+      printf("--------------------------------------------------------\n");
     }
   } else {
-    /* Execute main algorithm to find number of current patients */
-    int no_current_patients = __num_current_patients_util(argv[0]);
-    printf("Disease: <%s> - Number of current patients: <%d>\n",
-           argv[0], no_current_patients);
+    /* Get for the current disease its AVL tree */
+    void* result = hash_table_find(disease_ht, argv[0]);
+    if (result == NULL) {
+      report_warning("There is no disease recorded with Disease ID: <%s>",
+                     argv[0]);
+    } else {
+      /* Cast result to avl pointer */
+      avl_ptr disease_avl = (avl_ptr) result;
+      /* Execute main algorithm to find number of current patients */
+      int no_current_patients = __num_current_patients_util(disease_avl, argv[0], 0);
+      printf("Disease: <%s> - Number of current patients: <%d>\n\n",
+             argv[0], no_current_patients);
+      printf("--------------------------------------------------------\n");
+    }
   }
-  /* Print a new line for better output format in console */
-  printf("\n");
+  printf("--------------------------------------------------------\n");
 }
 
 int validate_exit(int argc, char** argv) {
@@ -352,7 +378,6 @@ int validate_exit(int argc, char** argv) {
 }
 
 void execute_exit() {
-  hash_table_print(disease_ht, stdout);
   /* Free all memory allocated by the program */
   hash_table_clear(patient_record_ht);
   hash_table_clear(disease_ht);

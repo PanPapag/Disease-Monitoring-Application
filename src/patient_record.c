@@ -134,17 +134,17 @@ int validate_patient_record_tokens(char** patient_record_tokens) {
     return INVALID_COUNTRY;
   /* entry_date: DD-MM-YYYY format */
   char* entry_date = patient_record_tokens[5];
-  if (!is_valid_date(entry_date))
+  if (!is_valid_date_string(entry_date))
     return INVALID_ENTRY_DATE;
   /* exit_date: DD-MM-YYYY format or - (not specified) */
   char* exit_date = patient_record_tokens[6];
-  if (!is_valid_date(exit_date) && !is_unspecified_date(exit_date)) {
+  if (!is_valid_date_string(exit_date) && !is_unspecified_date_string(exit_date)) {
     return INVALID_EXIT_DATE;
   }
   else {
-    if (!is_unspecified_date(exit_date)) {
+    if (!is_unspecified_date_string(exit_date)) {
       /* Check if exit date is earlier than the entry date */
-      if (compare_date(entry_date, exit_date) > 0)
+      if (compare_date_strings(entry_date, exit_date) > 0)
         return INVALID_EARLIER_EXIT_DATE;
     }
   }

@@ -48,32 +48,6 @@ void destroy_string(void *v) {
   }
 }
 
-/* DD-MM-YYYY format */
-int is_valid_date(char* date) {
-  if (strlen(date) != 10) {
-    return 0;
-  } else {
-    for (size_t i = 0; i < strlen(date); ++i) {
-      if (i == 2 || i == 5) {
-        if (date[i] != '-')
-          return 0;
-      } else {
-        if (!isdigit(date[i]))
-          return 0;
-      }
-    }
-  }
-  return 1;
-}
-/* Unspecified '-' */
-int is_unspecified_date(char* date) {
-  if ((strlen(date) == 1) && (date[0] == '-')) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
 int is_alpharithmetic(char* str) {
   for (size_t i = 0; i < strlen(str); ++i) {
     if (!isalnum(str[i]))
@@ -98,7 +72,39 @@ int is_number(char* str) {
   return 1;
 }
 
-int64_t compare_date(char* date1, char* date2) {
+/* DD-MM-YYYY format */
+int is_valid_date_string(char* date) {
+  if (strlen(date) != 10) {
+    return 0;
+  } else {
+    for (size_t i = 0; i < strlen(date); ++i) {
+      if (i == 2 || i == 5) {
+        if (date[i] != '-')
+          return 0;
+      } else {
+        if (!isdigit(date[i]))
+          return 0;
+      }
+    }
+  }
+  return 1;
+}
+/* Unspecified '-' */
+int is_unspecified_date_string(char* date) {
+  if ((strlen(date) == 1) && (date[0] == '-')) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+int is_unspecified_date_tm(struct tm date) {
+  char date_buf[11];
+  strftime(date_buf, sizeof(date_buf), "%d-%m-%Y", &date);
+  return !strcmp(date_buf, "00-01-1900");
+}
+
+int64_t compare_date_strings(char* date1, char* date2) {
   // Convert date1 string to struct tm
   struct tm date1_tm;
   memset(&date1_tm, 0, sizeof(struct tm));
