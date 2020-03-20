@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 #include "../includes/avl.h"
 #include "../includes/macros.h"
@@ -11,6 +10,8 @@
 program_parameters_t parameters;
 
 extern hash_table_ptr patient_record_ht;
+extern hash_table_ptr disease_ht;
+extern hash_table_ptr country_ht;
 
 int cmp(void *a, void *b) {
 	int v = *((int *) a);
@@ -23,7 +24,7 @@ void print(void *v, FILE *out) {
 }
 
 int main(int argc, char* argv[]) {
-  srandom((unsigned int) ((time(NULL) ^ (intptr_t) printf) & (intptr_t) main));
+	/* Parse command line arguments and update program parameters */
   parse_arguments(argc, argv);
   /* Define number of buckets as the max size of disease and country hash table */
   size_t no_buckets = MAX(parameters.ht_disease_size, parameters.ht_country_size);
@@ -32,28 +33,26 @@ int main(int argc, char* argv[]) {
                                         hash_string, compare_string,
                                         print_string, patient_record_print,
                                         NULL, patient_record_delete);
-  read_patient_records_file_and_update_structures();
-  main_loop();
   /* Create Disease Hash Table */
-  hash_table_ptr disease_ht = hash_table_create(parameters.ht_disease_size,
-                                                parameters.bucket_size,
-                                                hash_string, compare_string,
-                                                print_string, avl_print_inorder,
-                                                NULL, avl_clear);
-  /* Create Country Hash Table */ /*
-  hash_table_ptr country_ht = hash_table_create(char*, avl_ptr,
-                                                parameters.ht_disease_size,
-                                                parameters.bucket_size,
-                                                NULL, //TODO HASH F
-                                                patient_record_compare,
-                                                NULL, // TOSO PRINT CHAR*
-                                                patient_record_print); */
+  disease_ht = hash_table_create(parameters.ht_disease_size,
+																 parameters.bucket_size,
+                                 hash_string, compare_string,
+                                 print_string, avl_print_inorder,
+                                 NULL, avl_clear);
+  /* Create Country Hash Table */
+  country_ht = hash_table_create(parameters.ht_country_size,
+		                             parameters.bucket_size,
+                                 hash_string, compare_string,
+                                 print_string, avl_print_inorder,
+                                 NULL, avl_clear);
+  /* Read patient Record File and Update all Data Structures */
+	read_patient_records_file_and_update_structures();
 
+	/* DEBUG Purposes */
+	// hash_table_print(patient_record_ht, stdout);
 
-  hash_table_print(patient_record_ht, stdout);
-
-	hash_table_clear(disease_ht);
-  hash_table_clear(patient_record_ht);
-
+	/* Execute the app until command exit is given */
+  main_loop();
+  /* Everything find return EXIT_SUCCESS */
   return EXIT_SUCCESS;
 }

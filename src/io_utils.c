@@ -106,7 +106,7 @@ void read_patient_records_file_and_update_structures() {
     /* Check patient record tokens' validity */
     int code = validate_patient_record_tokens(patient_record_tokens);
     if (code == VALID_PATIENT_RECORD) {
-      execute_insert_patient_record(NO_PATIENT_RECORD_TOKENS, patient_record_tokens);
+      execute_insert_patient_record(patient_record_tokens);
     } else {
       print_patient_record_error(patient_record_tokens, code);
     }
@@ -176,8 +176,7 @@ int handle_command(char command[]) {
   } else if (!strcmp(command_tokens[0], "insertPatientRecord")) {
     if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
-      command_argc = command_tokens - 1;
-      execute_insert_patient_record(command_argc, command_argv);
+      execute_insert_patient_record(command_argv);
       __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
@@ -200,7 +199,7 @@ int handle_command(char command[]) {
     }
   } else if (!strcmp(command_tokens[0], "exit")) {
     if (validate_exit(command_no_tokens, command_tokens)) {
-      printf("EXECUTE\n");
+      execute_exit();
       command_code = EXIT;
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);

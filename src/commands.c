@@ -9,6 +9,8 @@
 #include "../includes/patient_record.h"
 
 hash_table_ptr patient_record_ht;
+hash_table_ptr disease_ht;
+hash_table_ptr country_ht;
 
 int validate_global_disease_stats(int argc, char** argv) {
   if (argc != 1 && argc != 3) {
@@ -190,7 +192,7 @@ int validate_insert_patient_record(int argc, char** argv) {
   return VALID_COMMAND;
 }
 
-void execute_insert_patient_record(int argc, char** argv) {
+void execute_insert_patient_record(char** argv) {
   patient_record_ptr patient_record = patient_record_create(argv);
   void* result = hash_table_find(patient_record_ht, patient_record->record_id);
   /* If record Id not found */
@@ -241,4 +243,11 @@ int validate_num_current_patients(int argc, char** argv) {
 
 int validate_exit(int argc, char** argv) {
   return argc == 1 ? VALID_COMMAND : INVALID_COMMAND;
+}
+
+void execute_exit() {
+  /* Free all memory allocated by the program */
+  hash_table_clear(patient_record_ht);
+  hash_table_clear(disease_ht);
+  hash_table_clear(country_ht);
 }
