@@ -6,6 +6,7 @@
 #include "../includes/avl.h"
 #include "../includes/commands.h"
 #include "../includes/hash_table.h"
+#include "../includes/io_utils.h"
 #include "../includes/utils.h"
 #include "../includes/patient_record.h"
 
@@ -195,7 +196,7 @@ int validate_insert_patient_record(int argc, char** argv) {
   return VALID_COMMAND;
 }
 
-void execute_insert_patient_record(char** argv) {
+int execute_insert_patient_record(char** argv) {
   patient_record_ptr patient_record = patient_record_create(argv);
   void* result = hash_table_find(patient_record_ht, patient_record->record_id);
   /* If record Id not found */
@@ -233,9 +234,13 @@ void execute_insert_patient_record(char** argv) {
       avl_insert(&country_avl, patient_record);
     }
   } else {
-    report_warning("Patient record with Record ID: <%s> already exists. "
-                   "Discarding patient record.", patient_record->record_id);
+    report_warning("Patient record with Record ID: <%s> already exists. ",
+                   patient_record->record_id);
+    /* Delete patient record and return */
+    patient_record_delete(patient_record);
+    return EXIT;
   }
+  return CONTINUE;
 }
 
 int validate_record_patient_exit(int argc, char** argv) {
@@ -358,8 +363,7 @@ void execute_num_current_patients(int argc, char** argv) {
     /* Get for the current disease its AVL tree */
     void* result = hash_table_find(disease_ht, argv[0]);
     if (result == NULL) {
-      report_warning("There is no disease recorded with Disease ID: <%s>",
-                     argv[0]);
+      report_warning("There is no disease recorded with Disease ID: <%s>", argv[0]);
     } else {
       /* Cast result to avl pointer */
       avl_ptr disease_avl = (avl_ptr) result;
@@ -378,9 +382,11 @@ int validate_exit(int argc, char** argv) {
 }
 
 void execute_exit() {
+  printf("\nExiting..\n\n");
   /* Free all memory allocated by the program */
   hash_table_clear(patient_record_ht);
   hash_table_clear(disease_ht);
   hash_table_clear(country_ht);
   list_clear(diseases_names);
+  exit(EXIT_SUCCESS);
 }

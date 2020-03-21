@@ -106,7 +106,15 @@ void read_patient_records_file_and_update_structures() {
     /* Check patient record tokens' validity */
     int code = validate_patient_record_tokens(patient_record_tokens);
     if (code == VALID_PATIENT_RECORD) {
-      execute_insert_patient_record(patient_record_tokens);
+      /* Check if a patient record with already existing Record ID was given */
+      if (execute_insert_patient_record(patient_record_tokens) == EXIT) {
+        /* Free wordexp object */
+        wordfree(&p);
+        /* Close file pointer */
+        fclose(fp);
+        /* Exit from the program */
+        execute_exit();
+      }
     } else {
       print_patient_record_error(patient_record_tokens, code);
     }
@@ -176,8 +184,15 @@ int handle_command(char command[]) {
   } else if (!strcmp(command_tokens[0], "insertPatientRecord")) {
     if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
-      execute_insert_patient_record(command_argv);
+      command_code = execute_insert_patient_record(command_argv);
       __FREE(command_argv);
+      /* Check if a patient record with already existing Record ID was given */
+      if (command_code == EXIT) {
+        /* Free wordexp object */
+        wordfree(&p);
+        /* Exit the progam */
+        execute_exit();
+      }
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: insertPatientRecord recordID patientFirstName "
