@@ -304,39 +304,31 @@ int validate_num_current_patients(int argc, char** argv) {
 }
 
 static inline
-int __count_current_patients(avl_node_ptr current_root, int* counter, int flag) {
+int __count_current_patients(avl_node_ptr current_root, int* counter) {
   avl_node_ptr temp = current_root;
   if (temp != NULL) {
-    __count_current_patients(temp->left_, counter, flag);
+    __count_current_patients(temp->left_, counter);
     patient_record_ptr patient_record = (patient_record_ptr) temp->data_;
     if (is_unspecified_date_tm(patient_record->exit_date)) {
-      if (flag) {
-        patient_record_print(patient_record, stdout);
-      }
       (*counter)++;
     }
-    __count_current_patients(temp->right_, counter, flag);
+    __count_current_patients(temp->right_, counter);
   }
 }
 
 static inline
-int __num_current_patients_util(avl_ptr disease_avl, char* disease_id, int flag) {
+int __num_current_patients_util(avl_ptr disease_avl, char* disease_id) {
   int counter = 0;
   /*
     Traverse inorder the AVL Treeand each time a patient record with unspecified
     exit date is found increase the counter for current patients
   */
-  printf("--------------------------------------------------------\n");
-  if (flag) {
-    printf("Disease: <%s> - Current patients\n\n", disease_id);
-  }
-   __count_current_patients(disease_avl->root_, &counter, flag);
+   __count_current_patients(disease_avl->root_, &counter);
   return counter;
 }
 
 void execute_num_current_patients(int argc, char** argv) {
   printf("\nCommand <numCurrentPatients> executed.\n\n");
-  printf("--------------------------------------------------------\n");
   if (argc == 0) {
     /* Print for every disease the number of patients that are still in hospital */
     for (size_t i = 1U; i <= list_size(diseases_names); ++i) {
@@ -352,12 +344,10 @@ void execute_num_current_patients(int argc, char** argv) {
         /* Cast result to avl pointer */
         avl_ptr disease_avl = (avl_ptr) result;
         /* Execute main algorithm to print current patients */
-        int no_current_patients = __num_current_patients_util(disease_avl, disease_id, 1);
-        if (no_current_patients == 0) {
-          printf("No are patients are currently affected by <%s>.\n\n",disease_id);
-        }
+        int no_current_patients = __num_current_patients_util(disease_avl, disease_id);
+        printf("Disease: <%s> - Number of current patients: <%d>\n",
+               disease_id, no_current_patients);
       }
-      printf("--------------------------------------------------------\n");
     }
   } else {
     /* Get for the current disease its AVL tree */
@@ -368,13 +358,13 @@ void execute_num_current_patients(int argc, char** argv) {
       /* Cast result to avl pointer */
       avl_ptr disease_avl = (avl_ptr) result;
       /* Execute main algorithm to find number of current patients */
-      int no_current_patients = __num_current_patients_util(disease_avl, argv[0], 0);
-      printf("Disease: <%s> - Number of current patients: <%d>\n\n",
+      int no_current_patients = __num_current_patients_util(disease_avl, argv[0]);
+      printf("Disease: <%s> - Number of current patients: <%d>\n",
              argv[0], no_current_patients);
-      printf("--------------------------------------------------------\n");
     }
   }
-  printf("--------------------------------------------------------\n");
+  /* Print a new line for better output format in console */
+  printf("\n");
 }
 
 int validate_exit(int argc, char** argv) {
