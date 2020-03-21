@@ -33,6 +33,9 @@
   /* Adds an element to the avl tree */
   void avl_insert(avl_ptr*, void*);
 
+  /* Returns the number of elements inserted into the avl tree */
+  size_t avl_size(avl_ptr);
+
   /* Find the element equals a given one */
   avl_node_ptr avl_find(avl_ptr, void*);
 

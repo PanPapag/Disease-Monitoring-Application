@@ -224,6 +224,10 @@ void avl_insert(avl_ptr* avl, void* new_data) {
   (*avl)->size_++;
 }
 
+size_t avl_size(avl_ptr avl) {
+  return avl->size_;
+}
+
 avl_node_ptr avl_find(avl_ptr avl, void* data) {
   avl_node_ptr temp = avl->root_;
   while (temp) {

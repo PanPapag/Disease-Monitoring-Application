@@ -42,13 +42,15 @@
   /* Checks if a date in struct tm format is unspecified aka 00-01-1900 */
   int is_unspecified_date_tm(struct tm);
   /*
-  Compares two given date formated strings.
+  Compares two given dates formated strings.
   Returns:
     - 0 if dates are equal.
     - > 0 if date1 is after of date2
     - < 0 if date1 is previous of date2
   */
   int64_t compare_date_strings(char*, char*);
+  /* Compares two given dates in struct tm format */
+  int64_t compare_date_tm(struct tm, struct tm);
 
   /* Given an array of strings it returns the same array without the first string */
   char** prune_command_name(char**, size_t);

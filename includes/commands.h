@@ -7,6 +7,7 @@
   };
 
   int validate_global_disease_stats(int, char**);
+  void execute_global_disease_stats(int, char**);
 
   int validate_disease_frequency(int, char**);
 

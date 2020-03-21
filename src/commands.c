@@ -27,8 +27,88 @@ int validate_global_disease_stats(int argc, char** argv) {
     char* date2 = argv[2];
     if (!is_valid_date_string(date1) || !is_valid_date_string(date2))
       return INVALID_COMMAND;
+    /* Check if date2 is earlier than the date1 */
+    if (compare_date_strings(date1, date2) > 0)
+      return INVALID_COMMAND;
   }
   return VALID_COMMAND;
+}
+
+static inline
+int __count_patients_between(avl_node_ptr current_root, int* counter,
+                             struct tm date1, struct tm date2) {
+
+  avl_node_ptr temp = current_root;
+  patient_record_ptr patient_record = NULL;
+  if (temp != NULL) {
+    /* Prune left search below this node as all entries has entry date < date1 */
+    patient_record = (patient_record_ptr) temp->left_->data_;
+    if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
+      __count_patients_between(temp->left_, counter, date1, date2);
+    }
+    patient_record = (patient_record_ptr) temp->data_;
+    /* Check if patient_record exit date is not specified */
+    if (!is_unspecified_date_tm(patient_record->exit_date)) {
+      /* Check upper bound */
+      if (compare_date_tm(patient_record->exit_date, date2) <= 0) {
+          /* Update counter */
+          (*counter)++;
+      }
+    }
+    __count_patients_between(temp->right_, counter, date1, date2);
+  }
+}
+
+static inline
+int __num_patients_between(avl_ptr disease_avl, char* date1, char* date2) {
+  int counter = 0;
+  /* Convert string dates to struct tm format */
+  struct tm date1_tm;
+  memset(&date1_tm, 0, sizeof(struct tm));
+  strptime(date1, "%d-%m-%Y", &date1_tm);
+
+  struct tm date2_tm;
+  memset(&date2_tm, 0, sizeof(struct tm));
+  strptime(date2, "%d-%m-%Y", &date2_tm);
+  /*
+    Traverse inorder the AVL Tree and each time a patient record is found
+    between the given range increase the counter for current patients.
+    We can prune the traversal under the node in which a patient record has
+    entry date < date1 or exit date > date2.
+  */
+   __count_patients_between(disease_avl->root_, &counter, date1_tm, date2_tm);
+  return counter;
+}
+
+void execute_global_disease_stats(int argc, char** argv) {
+  printf("\nCommand <globalDiseaseStats> executed.\n\n");
+  /* Print for every disease the number of total patients */
+  for (size_t i = 1U; i <= list_size(diseases_names); ++i) {
+    /* Get every disease id */
+    list_node_ptr list_node = list_get(diseases_names, i);
+    char* disease_id = (*(char**) list_node->data_);
+    /* Get for the current disease its AVL tree */
+    void* result = hash_table_find(disease_ht, disease_id);
+    if (result == NULL) {
+      report_warning("There is no disease recorded with Disease ID: <%s>",
+                     disease_id);
+    } else {
+      /* Cast result to avl pointer */
+      avl_ptr disease_avl = (avl_ptr) result;
+      if (argc == 0) {
+        /* Print total number of patients - size of AVL tre */
+        printf("Disease: <%s> - Number of total patients: <%d>\n",
+               disease_id, avl_size(disease_avl));
+      } else {
+        /* Print total number of patients in given date range */
+        printf("Disease: <%s> - Number of total patients between [%s] and [%s]: <%d>\n",
+               disease_id, argv[0], argv[1],
+               __num_patients_between(disease_avl, argv[0], argv[1]));
+      }
+    }
+  }
+  /* Print a new line for better output format in console */
+  printf("\n");
 }
 
 int validate_disease_frequency(int argc, char** argv) {
@@ -317,10 +397,10 @@ int __count_current_patients(avl_node_ptr current_root, int* counter) {
 }
 
 static inline
-int __num_current_patients_util(avl_ptr disease_avl, char* disease_id) {
+int __num_current_patients_util(avl_ptr disease_avl) {
   int counter = 0;
   /*
-    Traverse inorder the AVL Treeand each time a patient record with unspecified
+    Traverse inorder the AVL Tree and each time a patient record with unspecified
     exit date is found increase the counter for current patients
   */
    __count_current_patients(disease_avl->root_, &counter);
@@ -344,7 +424,7 @@ void execute_num_current_patients(int argc, char** argv) {
         /* Cast result to avl pointer */
         avl_ptr disease_avl = (avl_ptr) result;
         /* Execute main algorithm to print current patients */
-        int no_current_patients = __num_current_patients_util(disease_avl, disease_id);
+        int no_current_patients = __num_current_patients_util(disease_avl);
         printf("Disease: <%s> - Number of current patients: <%d>\n",
                disease_id, no_current_patients);
       }
@@ -358,7 +438,7 @@ void execute_num_current_patients(int argc, char** argv) {
       /* Cast result to avl pointer */
       avl_ptr disease_avl = (avl_ptr) result;
       /* Execute main algorithm to find number of current patients */
-      int no_current_patients = __num_current_patients_util(disease_avl, argv[0]);
+      int no_current_patients = __num_current_patients_util(disease_avl);
       printf("Disease: <%s> - Number of current patients: <%d>\n",
              argv[0], no_current_patients);
     }

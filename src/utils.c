@@ -114,12 +114,27 @@ int64_t compare_date_strings(char* date1, char* date2) {
   memset(&date2_tm, 0, sizeof(struct tm));
   strptime(date2, "%d-%m-%Y", &date2_tm);
   // Convert date1_tm back to seconds
-  char date1_buf[11];
+  char date1_buf[BUFFER_SIZE];
   strftime(date1_buf, sizeof(date1_buf), "%s", &date1_tm);
   size_t date1_to_secs;
   string_to_int64(date1_buf, (int64_t *) &date1_to_secs);
   // Convert date2_tm back to seconds
-  char date2_buf[11];
+  char date2_buf[BUFFER_SIZE];
+  strftime(date2_buf, sizeof(date2_buf), "%s", &date2_tm);
+  size_t date2_to_secs;
+  string_to_int64(date2_buf, (int64_t *) &date2_to_secs);
+  // Return the difference
+  return date1_to_secs - date2_to_secs;
+}
+
+int64_t compare_date_tm(struct tm date1_tm, struct tm date2_tm) {
+  // Convert date1_tm to seconds
+  char date1_buf[BUFFER_SIZE];
+  strftime(date1_buf, sizeof(date1_buf), "%s", &date1_tm);
+  size_t date1_to_secs;
+  string_to_int64(date1_buf, (int64_t *) &date1_to_secs);
+  // Convert date2_t to seconds
+  char date2_buf[BUFFER_SIZE];
   strftime(date2_buf, sizeof(date2_buf), "%s", &date2_tm);
   size_t date2_to_secs;
   string_to_int64(date2_buf, (int64_t *) &date2_to_secs);

@@ -133,21 +133,17 @@ void main_loop(void) {
     memset(&command, 0, sizeof(command));
     fgets(command, BUFFER_SIZE, stdin);
     command[strlen(command) - 1] = '\0';
-    /* Handle command and call correspodent function */
-    int result = handle_command(command);
-    if (result == EXIT) {
-      break;
-    }
+    /* Handle command and call correspodent function until exit will be given */
+    handle_command(command);
   }
 }
 
-int handle_command(char command[]) {
+void handle_command(char command[]) {
   wordexp_t p;
   char** command_tokens;
   int command_no_tokens;
   char** command_argv;
   int command_argc;
-  int command_code = CONTINUE;
   /* Use API POSIX to extract arguments */
   wordexp(command, &p, 0);
   command_tokens = p.we_wordv;
@@ -155,7 +151,10 @@ int handle_command(char command[]) {
   /* Call correspoding command function */
   if (!strcmp(command_tokens[0], "globalDiseaseStats")) {
     if (validate_global_disease_stats(command_no_tokens, command_tokens)) {
-      printf("EXECUTE\n");
+      command_argv = prune_command_name(command_tokens, command_no_tokens);
+      command_argc = command_no_tokens - 1;
+      execute_global_disease_stats(command_argc, command_argv);
+      __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: globalDiseaseStats [date1 date2]\n");
@@ -184,7 +183,7 @@ int handle_command(char command[]) {
   } else if (!strcmp(command_tokens[0], "insertPatientRecord")) {
     if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
-      command_code = execute_insert_patient_record(command_argv);
+      int command_code = execute_insert_patient_record(command_argv);
       __FREE(command_argv);
       /* Check if a patient record with already existing Record ID was given */
       if (command_code == EXIT) {
@@ -219,8 +218,10 @@ int handle_command(char command[]) {
     }
   } else if (!strcmp(command_tokens[0], "exit")) {
     if (validate_exit(command_no_tokens, command_tokens)) {
+      /* Free wordexp object */
+      wordfree(&p);
+      /* Exit the program */
       execute_exit();
-      command_code = EXIT;
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: exit\n");
@@ -232,8 +233,6 @@ int handle_command(char command[]) {
   printf("\n");
   /* Free wordexp object */
   wordfree(&p);
-  /* Return command code */
-  return command_code;
 }
 
 static void __report(const char* tag, const char* fmt, va_list args) {

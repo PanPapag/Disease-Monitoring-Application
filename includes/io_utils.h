@@ -16,7 +16,7 @@
   void main_loop(void);
 
   /* Given a command read from stding determine which function to call */
-  int handle_command(char[]);
+  void handle_command(char[]);
 
   /* Reports Error Messages */
   void report_error(const char *fmt, ...);
