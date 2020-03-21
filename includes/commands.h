@@ -10,6 +10,7 @@
   void execute_global_disease_stats(int, char**);
 
   int validate_disease_frequency(int, char**);
+  void execute_disease_frequency(int, char**);
 
   int validate_topk_diseases(int, char**);
 

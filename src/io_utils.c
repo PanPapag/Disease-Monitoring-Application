@@ -161,10 +161,13 @@ void handle_command(char command[]) {
     }
   } else if (!strcmp(command_tokens[0], "diseaseFrequency")) {
     if (validate_disease_frequency(command_no_tokens, command_tokens)) {
-      printf("EXECUTE\n");
+      command_argv = prune_command_name(command_tokens, command_no_tokens);
+      command_argc = command_no_tokens - 1;
+      execute_disease_frequency(command_argc, command_argv);
+      __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: diseaseFrequency virusName [country] date1 date2\n");
+      fprintf(stderr, "Usage: diseaseFrequency virusName date1 date2 [country]\n");
     }
   } else if (!strcmp(command_tokens[0], "topk-Diseases")) {
     if (validate_topk_diseases(command_no_tokens, command_tokens)) {

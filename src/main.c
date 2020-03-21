@@ -58,28 +58,7 @@ int main(int argc, char* argv[]) {
 	/* Execute the app until command exit is given */
   main_loop();
 	/* DEBUG Purposes */
-	//
-	// avl_ptr avl = avl_create(compare_ints, print_int);
-	//
-	// int N = 10000;
-	//
-	// int* value_array[N];
-	//
-	// // Δοκιμάζουμε την insert με νέες τιμές κάθε φορά και με αυτόματο free
-	// for (int i = 0; i < N; i++) {
-	//
-	// 	value_array[i] = create_int(i);
-	//
-	// 	avl_insert(&avl, value_array[i]);
-	// }
-	//
-	// printf("----------PRINT AVL --------\n");
-	// avl_print_inorder(avl, stdout);
-	//
-	// avl_node_ptr res_avl = avl_find(avl, value_array[0]);
-	// printf("FOUND: %d -> %d correct\n",*((int *)res_avl->data_), *value_array[0]);
-	//
-	// avl_clear(avl);
+
 
   /* Everything find return EXIT_SUCCESS */
   return EXIT_SUCCESS;

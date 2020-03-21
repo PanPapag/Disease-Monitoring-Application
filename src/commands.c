@@ -36,7 +36,7 @@ int validate_global_disease_stats(int argc, char** argv) {
 
 static inline
 int __count_patients_between(avl_node_ptr current_root, int* counter,
-                             struct tm date1, struct tm date2) {
+                             struct tm date1, struct tm date2, char* country) {
 
   avl_node_ptr temp = current_root;
   patient_record_ptr patient_record = NULL;
@@ -44,23 +44,30 @@ int __count_patients_between(avl_node_ptr current_root, int* counter,
     /* Prune left search below this node as all entries has entry date < date1 */
     patient_record = (patient_record_ptr) temp->left_->data_;
     if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
-      __count_patients_between(temp->left_, counter, date1, date2);
+      __count_patients_between(temp->left_, counter, date1, date2, country);
     }
     patient_record = (patient_record_ptr) temp->data_;
     /* Check if patient_record exit date is not specified */
     if (!is_unspecified_date_tm(patient_record->exit_date)) {
       /* Check upper bound */
       if (compare_date_tm(patient_record->exit_date, date2) <= 0) {
+        if (country != NULL) {
+          if (!strcmp(country, patient_record->country)) {
+            /* Update counter */
+            (*counter)++;
+          }
+        } else {
           /* Update counter */
           (*counter)++;
+        }
       }
     }
-    __count_patients_between(temp->right_, counter, date1, date2);
+    __count_patients_between(temp->right_, counter, date1, date2, country);
   }
 }
 
 static inline
-int __num_patients_between(avl_ptr disease_avl, char* date1, char* date2) {
+int __num_patients_between(avl_ptr disease_avl, char* date1, char* date2, char* country) {
   int counter = 0;
   /* Convert string dates to struct tm format */
   struct tm date1_tm;
@@ -76,7 +83,7 @@ int __num_patients_between(avl_ptr disease_avl, char* date1, char* date2) {
     We can prune the traversal under the node in which a patient record has
     entry date < date1 or exit date > date2.
   */
-   __count_patients_between(disease_avl->root_, &counter, date1_tm, date2_tm);
+   __count_patients_between(disease_avl->root_, &counter, date1_tm, date2_tm, country);
   return counter;
 }
 
@@ -100,10 +107,10 @@ void execute_global_disease_stats(int argc, char** argv) {
         printf("Disease: <%s> - Number of total patients: <%d>\n",
                disease_id, avl_size(disease_avl));
       } else {
-        /* Print total number of patients in given date range */
+        /* Print total number of patients in the given date range */
         printf("Disease: <%s> - Number of total patients between [%s] and [%s]: <%d>\n",
                disease_id, argv[0], argv[1],
-               __num_patients_between(disease_avl, argv[0], argv[1]));
+               __num_patients_between(disease_avl, argv[0], argv[1], NULL));
       }
     }
   }
@@ -137,21 +144,46 @@ int validate_disease_frequency(int argc, char** argv) {
         if (!isalnum(virus_name[i]) && virus_name[i] != '-')
           return INVALID_COMMAND;
       }
-      // Check country to contain only letters
-      char* country = argv[2];
-      if (!is_alphabetical(country))
-        return INVALID_COMMAND;
       // Check date1
-      char* date1 = argv[3];
+      char* date1 = argv[2];
       if (!is_valid_date_string(date1))
         return INVALID_COMMAND;
       // Check date2
-      char* date2 = argv[4];
+      char* date2 = argv[3];
       if (!is_valid_date_string(date2))
+        return INVALID_COMMAND;
+      // Check country to contain only letters
+      char* country = argv[4];
+      if (!is_alphabetical(country))
         return INVALID_COMMAND;
     }
   }
   return VALID_COMMAND;
+}
+
+void execute_disease_frequency(int argc, char** argv) {
+  printf("\nCommand <diseaseFrequency> executed.\n\n");
+  void* result = hash_table_find(disease_ht, argv[0]);
+  if (result == NULL) {
+    report_warning("There is no disease recorded with Disease ID: <%s>", argv[0]);
+  } else {
+    /* Cast result to avl pointer */
+    avl_ptr disease_avl = (avl_ptr) result;
+    /* Determine if country argument was given or not */
+    if (argc == 3) {
+      /* Print total number of patients in the given date range */
+      printf("Disease: <%s> - Number of total patients between [%s] and [%s]: <%d>\n",
+             argv[0], argv[1], argv[2],
+             __num_patients_between(disease_avl, argv[1], argv[2], NULL));
+    } else {
+      /* Print total number of patients for given country in the given date range */
+      printf("Disease: <%s> - Country: <%s> - Number of total patients between "
+            "[%s] and [%s]: <%d>\n", argv[0], argv[3], argv[1], argv[2],
+             __num_patients_between(disease_avl, argv[1], argv[2], argv[3]));
+    }
+  }
+  /* Print a new line for better output format in console */
+  printf("\n");
 }
 
 int validate_topk_diseases(int argc, char** argv) {
