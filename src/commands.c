@@ -43,29 +43,35 @@ int __count_patients_between(avl_node_ptr current_root, int* counter,
 
   avl_node_ptr temp = current_root;
   patient_record_ptr patient_record = NULL;
+  /* Prune left search below this node as all entries have entry date < date1 */
   if (temp != NULL) {
-    /* Prune left search below this node as all entries has entry date < date1 */
-    patient_record = (patient_record_ptr) temp->left_->data_;
-    if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
-      __count_patients_between(temp->left_, counter, date1, date2, country);
+    if (temp->left_ != NULL) {
+      patient_record = (patient_record_ptr) temp->left_->data_;
+      if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
+        __count_patients_between(temp->left_, counter, date1, date2, country);
+      }
     }
     patient_record = (patient_record_ptr) temp->data_;
     /* Check if patient_record exit date is not specified */
     if (!is_unspecified_date_tm(patient_record->exit_date)) {
       /* Check upper bound */
-      if (compare_date_tm(patient_record->exit_date, date2) <= 0) {
-        if (country != NULL) {
-          if (!strcmp(country, patient_record->country)) {
-            /* Update counter */
-            (*counter)++;
-          }
-        } else {
+      if (country != NULL) {
+        if (!strcmp(country, patient_record->country)) {
           /* Update counter */
           (*counter)++;
         }
+      } else {
+        /* Update counter */
+        (*counter)++;
       }
     }
-    __count_patients_between(temp->right_, counter, date1, date2, country);
+    /* Prune right search below this node as all entries have entry date > date2 */
+    if (temp->right_ != NULL) {
+      patient_record = (patient_record_ptr) temp->right_->data_;
+      if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
+        __count_patients_between(temp->right_, counter, date1, date2, country);
+      }
+    }
   }
 }
 
@@ -268,7 +274,14 @@ void execute_topk_diseases(int argc, char** argv) {
     }
     /* Update Hash Table country_stats while traversing country AVL */
     // TODO
-    /* Copy content to country stats structure and Remove Hash table country_stats */
+    if (argc == 2) {
+      /* Get total numer of patients for the current disease */
+      printf("TODO 2\n");
+    } else {
+      printf("TODO 4\n");
+      /* Get total numer of patients for the current disease in a given date range */
+    }
+    /* Copy content to country stats structure and Remove Hash table country_stats_ht */
     country_stats_ptr country_stats_table[no_diseases];
     for (size_t i = 0U; i < no_diseases; ++i) {
       /* Get every disease id */
@@ -277,8 +290,7 @@ void execute_topk_diseases(int argc, char** argv) {
       /* Check if current disease has been inserted to the country stats hash table */
       result = hash_table_find(country_stats_ht, disease_id);
       if (result == NULL) {
-        report_warning("Disease with Disease ID: <%s> not found.",
-                       disease_id);
+        report_warning("Disease with Disease ID: <%s> not found.", disease_id);
       } else {
         /* Copy disease id and store total number of patients */
         country_stats_table[i] = (country_stats_ptr) malloc(sizeof(*country_stats_table[i]));
@@ -289,14 +301,8 @@ void execute_topk_diseases(int argc, char** argv) {
     }
     /* Delete hash table */
     hash_table_clear(country_stats_ht);
-    /* Check number of arguments provided to call correspoding functions */
-    if (argc == 2) {
-      /* Get total numer of patients for the current disease */
-      printf("TODO 2\n");
-    } else {
-      printf("TODO 4\n");
-      /* Get total numer of patients for the current disease in a given date range */
-    }
+    /* Insert to max heap the elements of country_stats_table */
+    // TODO
     /* Free memory allocated for the country stats table */
     for (size_t i = 0U; i < no_diseases; ++i) {
       __FREE(country_stats_table[i]->disease_id);
