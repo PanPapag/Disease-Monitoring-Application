@@ -234,6 +234,73 @@ int validate_topk_diseases(int argc, char** argv) {
   return VALID_COMMAND;
 }
 
+static inline
+void __util_traverse_for_topk(avl_node_ptr current_root, hash_table_ptr ht,
+  char* (*get_value_to_hash)(patient_record_ptr)) {
+
+  avl_node_ptr temp = current_root;
+  if (temp != NULL) {
+    __util_traverse_for_topk(temp->left_, ht, get_value_to_hash);
+    /* Update hash table value  */
+    patient_record_ptr patient_record = (patient_record_ptr) temp->data_;
+    void* result = hash_table_find(ht, get_value_to_hash(patient_record));
+    if (result != NULL) {
+      (*(int*)result)++;
+    }
+    __util_traverse_for_topk(temp->right_, ht, get_value_to_hash);
+  }
+}
+
+static inline
+void __util_date_traverse_for_topk(avl_node_ptr current_root, hash_table_ptr ht,
+  char* (*get_value_to_hash)(patient_record_ptr), struct tm date1, struct tm date2) {
+
+  avl_node_ptr temp = current_root;
+  patient_record_ptr patient_record = NULL;
+  /* Prune left search below this node as all entries have entry date < date1 */
+  if (temp != NULL) {
+    if (temp->left_ != NULL) {
+      patient_record = (patient_record_ptr) temp->left_->data_;
+      if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
+        __util_date_traverse_for_topk(temp->left_, ht, get_value_to_hash, date1, date2);
+      }
+    }
+    patient_record = (patient_record_ptr) temp->data_;
+    /* Update hash table value  */
+    void* result = hash_table_find(ht, get_value_to_hash(patient_record));
+    if (result != NULL) {
+      (*(int*)result)++;
+    }
+    /* Prune right search below this node as all entries have entry date > date2 */
+    if (temp->right_ != NULL) {
+      patient_record = (patient_record_ptr) temp->right_->data_;
+      if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
+        __util_date_traverse_for_topk(temp->right_, ht, get_value_to_hash, date1, date2);
+      }
+    }
+  }
+}
+
+static inline
+void __util_execute_topk(avl_ptr avl, hash_table_ptr ht,
+  char* (*get_value_to_hash)(patient_record_ptr), char* date1, char* date2) {
+
+  if (date1 == NULL && date2 == NULL) {
+    __util_traverse_for_topk(avl->root_, ht, get_value_to_hash);
+  } else {
+    /* Convert string dates to struct tm format */
+    struct tm date1_tm;
+    memset(&date1_tm, 0, sizeof(struct tm));
+    strptime(date1, "%d-%m-%Y", &date1_tm);
+
+    struct tm date2_tm;
+    memset(&date2_tm, 0, sizeof(struct tm));
+    strptime(date2, "%d-%m-%Y", &date2_tm);
+
+    __util_date_traverse_for_topk(avl->root_, ht, get_value_to_hash, date1_tm, date2_tm);
+  }
+}
+
 void execute_topk_diseases(int argc, char** argv) {
   /* Extract info from arguemnts */
   int k = atoi(argv[0]);
@@ -273,13 +340,12 @@ void execute_topk_diseases(int argc, char** argv) {
       }
     }
     /* Update Hash Table country_stats while traversing country AVL */
-    // TODO
     if (argc == 2) {
       /* Get total numer of patients for the current disease */
-      printf("TODO 2\n");
+      __util_execute_topk(country_avl, country_stats_ht, get_disease_id, NULL, NULL);
     } else {
-      printf("TODO 4\n");
-      /* Get total numer of patients for the current disease in a given date range */
+      /* Get total number of patients for the current disease in a given date range */
+      __util_execute_topk(country_avl, country_stats_ht, get_disease_id, argv[2], argv[3]);
     }
     /* Copy content to country stats structure and Remove Hash table country_stats_ht */
     country_stats_ptr country_stats_table[no_diseases];
@@ -303,6 +369,9 @@ void execute_topk_diseases(int argc, char** argv) {
     hash_table_clear(country_stats_ht);
     /* Insert to max heap the elements of country_stats_table */
     // TODO
+    for (size_t i = 0; i < no_diseases; ++i) {
+      printf("%s - %d\n",country_stats_table[i]->disease_id, country_stats_table[i]->no_patients);
+    }
     /* Free memory allocated for the country stats table */
     for (size_t i = 0U; i < no_diseases; ++i) {
       __FREE(country_stats_table[i]->disease_id);

@@ -52,4 +52,9 @@
   /* Print message given a patient_record error code */
   void print_patient_record_error(char**, int);
 
+  /* Utility function to get the country member of a patient record */
+  char* get_country(patient_record_ptr);
+  /* Utility function to get the disease id member of a patient record */
+  char* get_disease_id(patient_record_ptr);
+
 #endif

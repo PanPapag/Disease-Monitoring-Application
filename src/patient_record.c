@@ -189,3 +189,11 @@ void print_patient_record_error(char** patient_record_tokens, int code) {
       break;
   }
 }
+
+char* get_country(patient_record_ptr patient_record) {
+  return patient_record->country;
+}
+
+char* get_disease_id(patient_record_ptr patient_record) {
+  return patient_record->disease_id;
+}
