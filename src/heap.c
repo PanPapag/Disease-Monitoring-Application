@@ -105,6 +105,8 @@ void heap_insert_max(heap_ptr* heap, void* key) {
     /* Go to parent node */
     temp = temp->parent_;
   }
+  // Increase heap size
+  (*heap)->size_++;
 }
 
 /*
@@ -120,11 +122,15 @@ void max_heapify(heap_ptr heap, heap_node_ptr current) {
   heap_node_ptr left = current->left_;
   heap_node_ptr right = current->right_;
   heap_node_ptr max = current;
-  if (heap->heap_cmp_func_(left->key_, max->key_) >= 0) {
-    max = left;
+  if (left != NULL) {
+    if (heap->heap_cmp_func_(left->key_, max->key_) >= 0) {
+      max = left;
+    }
   }
-  if (heap->heap_cmp_func_(right->key_, max->key_) >= 0) {
-    max = right;
+  if (right != NULL) {
+    if (heap->heap_cmp_func_(right->key_, max->key_) >= 0) {
+      max = right;
+    }
   }
   if (max != current) {
     /* Swap values */
@@ -137,13 +143,63 @@ void max_heapify(heap_ptr heap, heap_node_ptr current) {
   }
 }
 
+/* A utility function to get the ith node (by level order) of a heap */
+static inline
+heap_node_ptr __get_ith_heap_node(heap_node_ptr root, const size_t i) {
+  size_t  b = i;
+  /* Sanity check: If no tree, always return NULL. */
+  if (!root || i < 1)
+    return NULL;
+  /* If i is 1, we return the root. */
+  if (i == 1)
+    return root;
+  /* Set b to the value of the most significant binary digit
+     set in b. This is a known trick. */
+  while (b & (b - 1))
+    b &= b - 1;
+  /* We ignore that highest binary digit. */
+  b >>= 1;
+  /* Walk down the tree as directed by b. */
+  while (b) {
+    if (i & b) {
+      if (root->right_)
+        root = root->right_;
+      else
+        return NULL; /* Not a complete tree, or outside the tree. */
+    } else {
+      if (root->left_)
+        root = root->left_;
+      else
+        return NULL; /* Not a complete tree, or outside the tree. */
+    }
+    /* Next step. */
+    b >>= 1;
+  }
+  /* This is where we arrived at. */
+  return root;
+}
+
 void* heap_extract_max(heap_ptr* heap) {
   void* max_key = NULL;
   if ((*heap)->root_ != NULL) {
     /* In an max heap the max element is always in the root */
     max_key = (*heap)->root_->key_;
-    /* Set the root's key to the end node's key of the heap and free it right after */
-
+    /*
+      Set the root's key to the end node's key of the heap and free
+      it right after
+    */
+    heap_node_ptr last = __get_ith_heap_node((*heap)->root_, (*heap)->size_);
+    (*heap)->root_->key_ = last->key_;
+    if (last->parent_ != NULL) {
+      if (last->parent_->left_ == last) {
+        last->parent_->left_ = NULL;
+      } else {
+        last->parent_->right_ = NULL;
+      }
+    }
+    // TODO __FREE(last);
+    /* Decrease heap size and free memory allocated */
+    (*heap)->size_--;
     /* Heapify the complete binary tree */
     max_heapify(*heap, (*heap)->root_);
   }

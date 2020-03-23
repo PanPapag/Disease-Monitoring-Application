@@ -52,7 +52,11 @@ int main(int argc, char* argv[]) {
     test[i] = create_int(i);
     heap_insert_max(&heap, test[i]);
   }
-  printLevelOrder(heap->root_);
+  //printLevelOrder(heap->root_);
+  for (int i = 0; i < 10; ++i) {
+    void* res = heap_extract_max(&heap);
+    printf("MAX: %d\n",(*(int*)res));
+  }
   heap_clear(heap);
   /* Everything find return EXIT_SUCCESS */
   return EXIT_SUCCESS;
