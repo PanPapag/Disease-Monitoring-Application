@@ -50,12 +50,10 @@ int main(int argc, char* argv[]) {
   int* test[10];
   for (int i = 0; i < 10; ++i) {
     test[i] = create_int(i);
-    printf("INSERTING %d\n",i);
-    heap_insert(&heap, test[i]);
+    heap_insert_max(&heap, test[i]);
   }
   printLevelOrder(heap->root_);
-  for (int i = 0; i < 10; ++i)
-    free(test[i]);
+  heap_clear(heap);
   /* Everything find return EXIT_SUCCESS */
   return EXIT_SUCCESS;
 }

@@ -29,7 +29,7 @@ int* create_int(int v) {
 }
 
 int compare_int(void* a, void* b) {
-	return *(int*)a - *(int*)b;
+	return (*(int*)a) - (*(int*)b);
 }
 
 void print_int(void* v, FILE* out) {

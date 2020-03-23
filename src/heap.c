@@ -5,6 +5,7 @@
 
 #include "../includes/heap.h"
 #include "../includes/list.h"
+#include "../includes/macros.h"
 
 heap_ptr heap_create(int (*heap_cmp_func)(void*, void*),
                      void (*heap_print_func)(void*, FILE*),
@@ -23,6 +24,28 @@ heap_ptr heap_create(int (*heap_cmp_func)(void*, void*),
   return heap;
 }
 
+static inline
+void __heap_clear(heap_ptr heap, heap_node_ptr temp) {
+  if (temp == NULL)
+    return;
+
+  __heap_clear(heap, temp->left_);
+  __heap_clear(heap, temp->right_);
+
+  if (heap->heap_delete_func_ != NULL) {
+    heap->heap_delete_func_(temp->key_);
+  }
+  __FREE(temp);
+}
+
+void heap_clear(void* v) {
+  heap_ptr heap = (heap_ptr) v;
+  if (heap != NULL) {
+    __heap_clear(heap, heap->root_);
+    __FREE(heap);
+  }
+}
+
 /* Function to insert element in level order in a binary tree representing a heap */
 static inline
 void __insert(heap_node_ptr temp, heap_node_ptr new_node) {
@@ -31,12 +54,14 @@ void __insert(heap_node_ptr temp, heap_node_ptr new_node) {
   // Do level order traversal until we find
   // an empty place.
   while (list_size(queue) != 0) {
+    /* Get first node data and free allocated memory */
     list_node_ptr queue_front_node = list_pop_front(&queue);
     heap_node_ptr temp = (*(heap_node_ptr*) queue_front_node->data_);
-
+    free(queue_front_node);
+    /* Check wether to insert or push to the queue and continue all the way down */
     if (temp->left_ == NULL) {
       temp->left_ = new_node;
-      new_node->parent_ = temp->left_;
+      new_node->parent_ = temp;
       break;
     } else {
       list_push_back(&queue, &temp->left_);
@@ -44,7 +69,7 @@ void __insert(heap_node_ptr temp, heap_node_ptr new_node) {
 
     if (temp->right_ == NULL) {
       temp->right_ = new_node;
-      new_node->parent_ = temp->right_;
+      new_node->parent_ = temp;
       break;
     } else {
       list_push_back(&queue, &temp->right_);
@@ -53,7 +78,7 @@ void __insert(heap_node_ptr temp, heap_node_ptr new_node) {
   list_clear(queue);
 }
 
-void heap_insert(heap_ptr* heap, void* key) {
+void heap_insert_max(heap_ptr* heap, void* key) {
   // At first allocate a new heap node to store the key
   heap_node_ptr new_node = (heap_node_ptr) malloc(sizeof(heap_node_t));
   if (new_node == NULL) {
@@ -69,7 +94,60 @@ void heap_insert(heap_ptr* heap, void* key) {
   } else {
     __insert((*heap)->root_, new_node);
   }
-  // Fix the Heap property if it is violated TODO
+  // Fix the Heap property if it is violated
+  heap_node_ptr temp = new_node;
+  while (temp != (*heap)->root_ && (*heap)->heap_cmp_func_(temp->key_, temp->parent_->key_) >= 0) {
+    /* Swap values */
+    void* t_key = temp->key_;
+    void* p_key = temp->parent_->key_;
+    temp->key_ = p_key;
+    temp->parent_->key_ = t_key;
+    /* Go to parent node */
+    temp = temp->parent_;
+  }
+}
+
+/*
+  A recursive method to heapify a subtree with the root at given index
+ This method assumes that the subtrees are already heapified
+*/
+static inline
+void max_heapify(heap_ptr heap, heap_node_ptr current) {
+  /* Alwayes check for sanity and return immediately */
+  if (current == NULL) {
+    return;
+  }
+  heap_node_ptr left = current->left_;
+  heap_node_ptr right = current->right_;
+  heap_node_ptr max = current;
+  if (heap->heap_cmp_func_(left->key_, max->key_) >= 0) {
+    max = left;
+  }
+  if (heap->heap_cmp_func_(right->key_, max->key_) >= 0) {
+    max = right;
+  }
+  if (max != current) {
+    /* Swap values */
+    void* max_key = max->key_;
+    void* cur_key = current->key_;
+    max->key_ = cur_key;
+    current->key_ = max_key;
+    /* Continue recursively */
+    max_heapify(heap, max);
+  }
+}
+
+void* heap_extract_max(heap_ptr* heap) {
+  void* max_key = NULL;
+  if ((*heap)->root_ != NULL) {
+    /* In an max heap the max element is always in the root */
+    max_key = (*heap)->root_->key_;
+    /* Set the root's key to the end node's key of the heap and free it right after */
+
+    /* Heapify the complete binary tree */
+    max_heapify(*heap, (*heap)->root_);
+  }
+  return max_key;
 }
 
 /* Print nodes at a given level */

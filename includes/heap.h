@@ -22,7 +22,13 @@
   /* Creates a new avl tree given compare, print and delete functions */
   heap_ptr heap_create(int (*)(void*, void*), void (*)(void*, FILE*), void (*)(void*));
 
+  /* Clear a heap by deallocating all memory allocated */
+  void heap_clear(void*);
+
   /* Inserts a new key to the heap */
-  void heap_insert(heap_ptr*, void*);
+  void heap_insert_max(heap_ptr*, void*);
+
+  /* Method to remove max element of the heap */
+  void* heap_extract_max(heap_ptr*);
 
 #endif
