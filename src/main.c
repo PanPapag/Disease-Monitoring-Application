@@ -15,20 +15,6 @@ extern hash_table_ptr country_ht;
 
 extern list_ptr diseases_names;
 
-int* create_int(int value) {
-	int* p = malloc(sizeof(int));
-	*p = value;
-	return p;
-}
-
-int compare_ints(void* a, void* b) {
-	return *(int*)a - *(int*)b;
-}
-
-void print_int(void *v, FILE *out) {
-	fprintf(out, "%d\n", (*(int *)v));
-}
-
 int main(int argc, char* argv[]) {
 	/* Parse command line arguments and update program parameters */
   parse_arguments(argc, argv);

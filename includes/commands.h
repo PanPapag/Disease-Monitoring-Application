@@ -6,6 +6,12 @@
     VALID_COMMAND
   };
 
+  typedef struct country_stats_t* country_stats_ptr;
+  struct country_stats_t {
+    char* disease_id;
+    int no_patients;
+  } country_stats_t;
+
   int validate_global_disease_stats(int, char**);
   void execute_global_disease_stats(int, char**);
 
@@ -13,6 +19,7 @@
   void execute_disease_frequency(int, char**);
 
   int validate_topk_diseases(int, char**);
+  void execute_topk_diseases(int, char**);
 
   int validate_topk_countries(int, char**);
 

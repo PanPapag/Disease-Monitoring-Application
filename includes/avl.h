@@ -24,7 +24,7 @@
     void (*avl_print_func_)(void*, FILE*);
   } avl_t;
 
-  /* Creates a new avl tree given a type, compare and print functions */
+  /* Creates a new avl tree given compare, print and delete functions */
   avl_ptr avl_create(int (*)(void*, void*), void (*)(void*, FILE*));
 
   /* Generic Purpose Delete Function of AVL Tree */

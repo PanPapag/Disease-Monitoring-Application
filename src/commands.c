@@ -6,9 +6,12 @@
 #include "../includes/avl.h"
 #include "../includes/commands.h"
 #include "../includes/hash_table.h"
+#include "../includes/macros.h"
 #include "../includes/io_utils.h"
 #include "../includes/utils.h"
 #include "../includes/patient_record.h"
+
+program_parameters_t parameters;
 
 hash_table_ptr patient_record_ht;
 hash_table_ptr disease_ht;
@@ -223,6 +226,83 @@ int validate_topk_diseases(int argc, char** argv) {
     }
   }
   return VALID_COMMAND;
+}
+
+void execute_topk_diseases(int argc, char** argv) {
+  /* Extract info from arguemnts */
+  int k = atoi(argv[0]);
+  char* country = argv[1];
+  /* Get for the given country its AVL tree */
+  void* result = hash_table_find(country_ht, country);
+  if (result == NULL) {
+    report_warning("There is no Country: <%s> recorded.", country);
+  } else {
+    /* Cast result to avl pointer */
+    avl_ptr country_avl = (avl_ptr) result;
+    /* Get the total number of diseases reported in the system */
+    int no_diseases = list_size(diseases_names);
+    /*
+      Create a hash table to to map disease id -> total number of patients
+      for the given country
+    */
+    hash_table_ptr country_stats_ht = hash_table_create(no_diseases,
+                                                     parameters.bucket_size,
+                                                     hash_string, compare_string,
+                                                     print_string, print_int,
+                                                     NULL, destroy_int);
+    /* Initialize hash table - for each disease set total number ot patients to 0 */
+    for (size_t i = 1U; i <= no_diseases; ++i) {
+      /* Get every disease id */
+      list_node_ptr list_node = list_get(diseases_names, i);
+      char* disease_id = (*(char**) list_node->data_);
+      /* Check if current disease already inserted to the country stats hash table */
+      result = hash_table_find(country_stats_ht, disease_id);
+      if (result == NULL) {
+        int* init_patients = create_int(0);
+        /* Update hash table */
+        hash_table_insert(&country_stats_ht, disease_id, init_patients);
+      } else {
+        report_warning("Disease with Disease ID: <%s> already specified.",
+                       disease_id);
+      }
+    }
+    /* Update Hash Table country_stats while traversing country AVL */
+    // TODO
+    /* Copy content to country stats structure and Remove Hash table country_stats */
+    country_stats_ptr country_stats_table[no_diseases];
+    for (size_t i = 0U; i < no_diseases; ++i) {
+      /* Get every disease id */
+      list_node_ptr list_node = list_get(diseases_names, i+1);
+      char* disease_id = (*(char**) list_node->data_);
+      /* Check if current disease has been inserted to the country stats hash table */
+      result = hash_table_find(country_stats_ht, disease_id);
+      if (result == NULL) {
+        report_warning("Disease with Disease ID: <%s> not found.",
+                       disease_id);
+      } else {
+        /* Copy disease id and store total number of patients */
+        country_stats_table[i] = (country_stats_ptr) malloc(sizeof(*country_stats_table[i]));
+        country_stats_table[i]->disease_id = (char*) malloc((strlen(disease_id) + 1) * sizeof(char));
+        strcpy(country_stats_table[i]->disease_id, disease_id);
+        country_stats_table[i]->no_patients = (*(int*) result);
+      }
+    }
+    /* Delete hash table */
+    hash_table_clear(country_stats_ht);
+    /* Check number of arguments provided to call correspoding functions */
+    if (argc == 2) {
+      /* Get total numer of patients for the current disease */
+      printf("TODO 2\n");
+    } else {
+      printf("TODO 4\n");
+      /* Get total numer of patients for the current disease in a given date range */
+    }
+    /* Free memory allocated for the country stats table */
+    for (size_t i = 0U; i < no_diseases; ++i) {
+      __FREE(country_stats_table[i]->disease_id);
+      __FREE(country_stats_table[i]);
+    }
+  }
 }
 
 int validate_topk_countries(int argc, char** argv) {

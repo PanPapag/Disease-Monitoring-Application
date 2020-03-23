@@ -21,7 +21,7 @@
       size_t data_size_;
       int (*list_cmp_func_)(void*, void*);
       void (*list_print_func_)(void*, FILE*);
-      void (*list_data_delete_func_)(void*);
+      void (*list_delete_func_)(void*);
   } list_t;
 
   /* Creates a new list given a type, compare and print functions */

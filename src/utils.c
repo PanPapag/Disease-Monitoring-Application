@@ -22,6 +22,27 @@ size_t hash_uint(void* key) {
   return x;
 }
 
+int* create_int(int v) {
+	int* p = malloc(sizeof(int));
+	*p = v;
+	return p;
+}
+
+int compare_ints(void* a, void* b) {
+	return *(int*)a - *(int*)b;
+}
+
+void print_int(void* v, FILE* out) {
+	fprintf(out, "%d\n", (*(int *)v));
+}
+
+void destroy_int(void* v) {
+  if (v != NULL) {
+    int* i = (int*) v;
+    __FREE(i);
+  }
+}
+
 size_t hash_string(void* value) {
   // djb2 hash function
   size_t hash = 5381;

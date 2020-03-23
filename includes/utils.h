@@ -18,6 +18,14 @@
 
   /* Hash Function for unsigned integers */
   size_t hash_uint(void*);
+  /* Returns an integer in a new memory address with the given value */
+  int* create_int(int);
+  /* Prints a given int* */
+  void print_int(void*, FILE* out);
+  /* Compares two given integers */
+  int compare_int(void*, void*);
+  /* Free a pointer to int */
+  void destroy_int(void*);
 
   /* Hash Function for strings */
   size_t hash_string(void*);
