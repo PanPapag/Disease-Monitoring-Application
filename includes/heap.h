@@ -13,7 +13,6 @@
 
   struct heap_t {
     heap_node_ptr root_;
-    heap_node_ptr end_leaf_;
     size_t size_;
     int (*heap_cmp_func_)(void*, void*);
     void (*heap_print_func_)(void*, FILE*);
@@ -24,6 +23,6 @@
   heap_ptr heap_create(int (*)(void*, void*), void (*)(void*, FILE*), void (*)(void*));
 
   /* Inserts a new key to the heap */
-  void heap_insert(heap_ptr, void*);
+  void heap_insert(heap_ptr*, void*);
 
 #endif

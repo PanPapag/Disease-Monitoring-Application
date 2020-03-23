@@ -31,8 +31,9 @@ void list_clear(list_ptr list) {
   list_node_ptr next;
   while (current != NULL) {
     next = current->next_;
-    if (list->list_delete_func_ != NULL)
+    if (list->list_delete_func_ != NULL) {
       list->list_delete_func_(current->data_);
+    } 
     __FREE(current);
     current = next;
   }

@@ -28,7 +28,7 @@ int* create_int(int v) {
 	return p;
 }
 
-int compare_ints(void* a, void* b) {
+int compare_int(void* a, void* b) {
 	return *(int*)a - *(int*)b;
 }
 
