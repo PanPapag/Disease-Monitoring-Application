@@ -197,37 +197,12 @@ void* heap_extract_max(heap_ptr* heap) {
         last->parent_->right_ = NULL;
       }
     }
-    // TODO __FREE(last);
-    /* Decrease heap size and free memory allocated */
+    /* Decrease heap size and free memory allocated - Check not to delete root */
     (*heap)->size_--;
+    if ((*heap)->size_ != 0)
+      __FREE(last);
     /* Heapify the complete binary tree */
     max_heapify(*heap, (*heap)->root_);
   }
   return max_key;
-}
-
-/* Print nodes at a given level */
-void printGivenLevel(heap_node_ptr root, int level)
-{
-    if (root == NULL) {
-      return;
-    }
-    if (level == 1)
-        printf("%d ", (*(int*)root->key_));
-    else if (level > 1)
-    {
-        printGivenLevel(root->left_, level-1);
-        printGivenLevel(root->right_, level-1);
-    }
-}
-
-/* Function to print level order traversal a tree*/
-void printLevelOrder(heap_node_ptr root)
-{
-    int i;
-    for (i=1; i<=4; i++) {
-      printf("LEVEL: %d\n",i);
-      printGivenLevel(root, i);
-      printf("\n");
-    }
 }
