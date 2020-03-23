@@ -7,6 +7,7 @@
   };
 
   typedef struct country_stats_t* country_stats_ptr;
+  
   struct country_stats_t {
     char* disease_id;
     int no_patients;

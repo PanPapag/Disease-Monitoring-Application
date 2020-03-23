@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "../includes/commands.h"
 #include "../includes/macros.h"
 #include "../includes/utils.h"
 
@@ -169,4 +170,10 @@ char** prune_command_name(char** src, size_t size) {
     *(dest + i - 1) = src[i];
   }
   return dest;
+}
+
+int compare_country_stats(void* a, void* b) {
+  country_stats_ptr cs_a = (country_stats_ptr) a;
+  country_stats_ptr cs_b = (country_stats_ptr) b;
+  return cs_a->no_patients - cs_b->no_patients;
 }

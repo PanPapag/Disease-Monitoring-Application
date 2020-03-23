@@ -6,10 +6,12 @@
 #include "../includes/avl.h"
 #include "../includes/commands.h"
 #include "../includes/hash_table.h"
-#include "../includes/macros.h"
+#include "../includes/heap.h"
 #include "../includes/io_utils.h"
-#include "../includes/utils.h"
+#include "../includes/list.h"
+#include "../includes/macros.h"
 #include "../includes/patient_record.h"
+#include "../includes/utils.h"
 
 program_parameters_t parameters;
 
@@ -98,7 +100,7 @@ int __num_patients_between(avl_ptr disease_avl, char* date1, char* date2, char* 
 
 void execute_global_disease_stats(int argc, char** argv) {
   printf("\nCommand <globalDiseaseStats> executed.\n\n");
-  /* Print for every disease the number of total patients */
+  /* Print for every disease the total number of patients */
   for (size_t i = 1U; i <= list_size(diseases_names); ++i) {
     /* Get every disease id */
     list_node_ptr list_node = list_get(diseases_names, i);
@@ -113,11 +115,11 @@ void execute_global_disease_stats(int argc, char** argv) {
       avl_ptr disease_avl = (avl_ptr) result;
       if (argc == 0) {
         /* Print total number of patients - size of AVL tre */
-        printf("Disease: <%s> - Number of total patients: <%d>\n",
+        printf("Disease: <%s> - Total number of patients: <%d>\n",
                disease_id, avl_size(disease_avl));
       } else {
         /* Print total number of patients in the given date range */
-        printf("Disease: <%s> - Number of total patients between [%s] and [%s]: <%d>\n",
+        printf("Disease: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
                disease_id, argv[0], argv[1],
                __num_patients_between(disease_avl, argv[0], argv[1], NULL));
       }
@@ -181,12 +183,12 @@ void execute_disease_frequency(int argc, char** argv) {
     /* Determine if country argument was given or not */
     if (argc == 3) {
       /* Print total number of patients in the given date range */
-      printf("Disease: <%s> - Number of total patients between [%s] and [%s]: <%d>\n",
+      printf("Disease: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
              argv[0], argv[1], argv[2],
              __num_patients_between(disease_avl, argv[1], argv[2], NULL));
     } else {
       /* Print total number of patients for given country in the given date range */
-      printf("Disease: <%s> - Country: <%s> - Number of total patients between "
+      printf("Disease: <%s> - Country: <%s> - Total number of patients between "
             "[%s] and [%s]: <%d>\n", argv[0], argv[3], argv[1], argv[2],
              __num_patients_between(disease_avl, argv[1], argv[2], argv[3]));
     }
@@ -367,11 +369,30 @@ void execute_topk_diseases(int argc, char** argv) {
     }
     /* Delete hash table */
     hash_table_clear(country_stats_ht);
-    /* Insert to max heap the elements of country_stats_table */
-    // TODO
+    /*
+      Build on the fly a max heap and insert there the elements
+      of the country_stats_table
+    */
+    heap_ptr heap = heap_create(compare_country_stats, NULL, NULL);
     for (size_t i = 0; i < no_diseases; ++i) {
-      printf("%s - %d\n",country_stats_table[i]->disease_id, country_stats_table[i]->no_patients);
+      heap_insert_max(&heap, country_stats_table[i]);
     }
+    // /* Extract top k */
+    for (size_t i = 0; i < k; ++i) {
+      result = heap_extract_max(&heap);
+      if (result != NULL) {
+        country_stats_ptr country_stats_entry = (country_stats_ptr) result;
+        if (argc == 2) {
+          printf("Disease: <%s> - Total number of patients: <%d>\n",
+                 country_stats_entry->disease_id, country_stats_entry->no_patients);
+        } else {
+          printf("Disease: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
+                country_stats_entry->disease_id, argv[2], argv[3], country_stats_entry->no_patients);
+        }
+      }
+    }
+    /* Delete heap */
+    heap_clear(heap);
     /* Free memory allocated for the country stats table */
     for (size_t i = 0U; i < no_diseases; ++i) {
       __FREE(country_stats_table[i]->disease_id);

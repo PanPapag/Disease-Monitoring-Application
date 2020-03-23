@@ -63,4 +63,7 @@
   /* Given an array of strings it returns the same array without the first string */
   char** prune_command_name(char**, size_t);
 
+  /* Compare function for country_stats structures */
+  int compare_country_stats(void*, void*);
+
 #endif

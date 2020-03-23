@@ -45,23 +45,6 @@ int main(int argc, char* argv[]) {
 	read_patient_records_file_and_update_structures();
 	/* Execute the app until command exit is given */
   main_loop();
-	/* DEBUG Purposes */
-  // heap_ptr heap = heap_create(compare_int, print_int, NULL);
-  // int* test[10];
-  // for (int i = 0; i < 10; ++i) {
-  //   test[i] = create_int(i);
-  //   heap_insert_max(&heap, test[i]);
-  // }
-  // //printLevelOrder(heap->root_);
-  // for (int i = 0; i < 10; ++i) {
-  //   void* res = heap_extract_max(&heap);
-  //   printf("MAX: %d\n",(*(int*)res));
-  // }
-  // heap_clear(heap);
-  // for (int i = 0; i < 10; ++i) {
-  //   free(test[i]);
-  // }
-  // free(heap);
   /* Everything find return EXIT_SUCCESS */
   return EXIT_SUCCESS;
 }
