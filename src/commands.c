@@ -45,14 +45,16 @@ int __count_patients_between(avl_node_ptr current_root, int* counter,
                              struct tm date1, struct tm date2, char* country) {
 
   avl_node_ptr temp = current_root;
+  patient_record_ptr patient_record = NULL;
   /* Prune left search below this node as all entries have entry date < date1 */
   if (temp != NULL) {
-    __count_patients_between(temp->left_, counter, date1, date2, country);
-    patient_record_ptr patient_record = (patient_record_ptr) temp->data_;
+    patient_record = (patient_record_ptr) temp->data_;
+    if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
+      __count_patients_between(temp->left_, counter, date1, date2, country);
+    }
+    patient_record = (patient_record_ptr) temp->data_;
     /* Check if patient_record exit date is not specified */
-    if (
-        compare_date_tm(date1, patient_record->entry_date) <= 0 &&
-        compare_date_tm(patient_record->exit_date, date2) <= 0) {
+    if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
       /* Check upper bound */
       if (country != NULL) {
         if (!strcmp(country, patient_record->country)) {
@@ -64,7 +66,6 @@ int __count_patients_between(avl_node_ptr current_root, int* counter,
         (*counter)++;
       }
     }
-    /* Prune right search below this node as all entries have entry date > date2 */
     __count_patients_between(temp->right_, counter, date1, date2, country);
   }
 }
@@ -261,20 +262,14 @@ void __util_date_traverse_for_topk(avl_node_ptr current_root, hash_table_ptr ht,
     }
 
     patient_record = (patient_record_ptr) temp->data_;
-    if (compare_date_tm(date1, patient_record->entry_date) <= 0 &&
-        compare_date_tm(patient_record->exit_date, date2) <= 0) {
+    if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
       /* Update hash table value  */
       void* result = hash_table_find(ht, get_value_to_hash(patient_record));
       if (result != NULL) {
-        patient_record_print(patient_record, stdout); // TODO
         (*(int*)result)++;
       }
     }
-    /* Prune right search below this node as all entries have entry date > date2 */
-    patient_record = (patient_record_ptr) temp->data_;
-    if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
-      __util_date_traverse_for_topk(temp->right_, ht, get_value_to_hash, date1, date2);
-    }
+    __util_date_traverse_for_topk(temp->right_, ht, get_value_to_hash, date1, date2);
   }
 }
 
