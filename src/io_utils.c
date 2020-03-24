@@ -181,7 +181,10 @@ void handle_command(char command[]) {
     }
   } else if (!strcmp(command_tokens[0], "topk-Countries")) {
     if (validate_topk_countries(command_no_tokens, command_tokens)) {
-      printf("EXECUTE\n");
+      command_argv = prune_command_name(command_tokens, command_no_tokens);
+      command_argc = command_no_tokens - 1;
+      execute_topk_countries(command_argc, command_argv);
+      __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: topk-Countries k disease [date1 date2]\n");

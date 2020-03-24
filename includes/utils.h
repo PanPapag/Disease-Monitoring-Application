@@ -65,5 +65,7 @@
 
   /* Compare function for country_stats structures */
   int compare_country_stats(void*, void*);
+  /* Compare function for country_stats structures */
+  int compare_disease_stats(void*, void*);
 
 #endif

@@ -16,6 +16,7 @@ extern hash_table_ptr disease_ht;
 extern hash_table_ptr country_ht;
 
 extern list_ptr diseases_names;
+extern list_ptr countries_names;
 
 int main(int argc, char* argv[]) {
 	/* Parse command line arguments and update program parameters */
@@ -41,6 +42,8 @@ int main(int argc, char* argv[]) {
                                  NULL, avl_clear);
 	/* Initialize a list to store all disease names */
 	diseases_names = list_create(STRING*, print_string, compare_string, NULL);
+  /* Initialize a list to store all disease names */
+	countries_names = list_create(STRING*, print_string, compare_string, NULL);
   /* Read patient Record File and Update all Data Structures */
 	read_patient_records_file_and_update_structures();
 	/* Execute the app until command exit is given */

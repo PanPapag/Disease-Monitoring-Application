@@ -7,11 +7,16 @@
   };
 
   typedef struct country_stats_t* country_stats_ptr;
-  
   struct country_stats_t {
     char* disease_id;
     int no_patients;
   } country_stats_t;
+
+  typedef struct disease_stats_t* disease_stats_ptr;
+  struct disease_stats_t {
+    char* country;
+    int no_patients;
+  } disease_stats_t;
 
   int validate_global_disease_stats(int, char**);
   void execute_global_disease_stats(int, char**);
@@ -23,6 +28,7 @@
   void execute_topk_diseases(int, char**);
 
   int validate_topk_countries(int, char**);
+  void execute_topk_countries(int, char**);
 
   int validate_insert_patient_record(int, char**);
   int execute_insert_patient_record(char**);

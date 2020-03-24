@@ -20,6 +20,7 @@ hash_table_ptr disease_ht;
 hash_table_ptr country_ht;
 
 list_ptr diseases_names;
+list_ptr countries_names;
 
 int validate_global_disease_stats(int argc, char** argv) {
   if (argc != 1 && argc != 3) {
@@ -206,23 +207,19 @@ int validate_topk_diseases(int argc, char** argv) {
       char* k = argv[1];
       if (!is_number(k))
         return INVALID_COMMAND;
-      // Check virus name to contain only letters, numbers and possibly '-'
-      char* virus_name = argv[2];
-      for (size_t i = 0; i < strlen(virus_name); ++i) {
-        if (!isalnum(virus_name[i]) && virus_name[i] != '-')
-          return INVALID_COMMAND;
-      }
+      // Check country to contain only letters
+      char* country = argv[2];
+      if (!is_alphabetical(country))
+        return INVALID_COMMAND;
     } else {
       // Check k
       char* k = argv[1];
       if (!is_number(k))
         return INVALID_COMMAND;
-      // Check virus name to contain only letters, numbers and possibly '-'
-      char* virus_name = argv[2];
-      for (size_t i = 0; i < strlen(virus_name); ++i) {
-        if (!isalnum(virus_name[i]) && virus_name[i] != '-')
-          return INVALID_COMMAND;
-      }
+      // Check country to contain only letters
+      char* country = argv[2];
+      if (!is_alphabetical(country))
+        return INVALID_COMMAND;
       // Check date1
       char* date1 = argv[3];
       if (!is_valid_date_string(date1))
@@ -304,6 +301,7 @@ void __util_execute_topk(avl_ptr avl, hash_table_ptr ht,
 }
 
 void execute_topk_diseases(int argc, char** argv) {
+  printf("\nCommand <topk-Diseases> executed.\n");
   /* Extract info from arguemnts */
   int k = atoi(argv[0]);
   char* country = argv[1];
@@ -343,10 +341,10 @@ void execute_topk_diseases(int argc, char** argv) {
     }
     /* Update Hash Table country_stats while traversing country AVL */
     if (argc == 2) {
-      /* Get total numer of patients for the current disease */
+      /* Get total numer of patients for the current country */
       __util_execute_topk(country_avl, country_stats_ht, get_disease_id, NULL, NULL);
     } else {
-      /* Get total number of patients for the current disease in a given date range */
+      /* Get total number of patients for the current country in a given date range */
       __util_execute_topk(country_avl, country_stats_ht, get_disease_id, argv[2], argv[3]);
     }
     /* Copy content to country stats structure and Remove Hash table country_stats_ht */
@@ -377,7 +375,7 @@ void execute_topk_diseases(int argc, char** argv) {
     for (size_t i = 0; i < no_diseases; ++i) {
       heap_insert_max(&heap, country_stats_table[i]);
     }
-    // /* Extract top k */
+    /* Extract top k */
     for (size_t i = 0; i < k; ++i) {
       result = heap_extract_max(&heap);
       if (result != NULL) {
@@ -410,19 +408,23 @@ int validate_topk_countries(int argc, char** argv) {
       char* k = argv[1];
       if (!is_number(k))
         return INVALID_COMMAND;
-      // Check country to contain only letters
-      char* country = argv[2];
-      if (!is_alphabetical(country))
-        return INVALID_COMMAND;
+      // Check virus name to contain only letters, numbers and possibly '-'
+      char* virus_name = argv[2];
+      for (size_t i = 0; i < strlen(virus_name); ++i) {
+        if (!isalnum(virus_name[i]) && virus_name[i] != '-')
+          return INVALID_COMMAND;
+      }
     } else {
       // Check k
       char* k = argv[1];
       if (!is_number(k))
         return INVALID_COMMAND;
-      // Check country to contain only letters
-      char* country = argv[2];
-      if (!is_alphabetical(country))
-        return INVALID_COMMAND;
+      // Check virus name to contain only letters, numbers and possibly '-'
+      char* virus_name = argv[2];
+      for (size_t i = 0; i < strlen(virus_name); ++i) {
+        if (!isalnum(virus_name[i]) && virus_name[i] != '-')
+          return INVALID_COMMAND;
+      }
       // Check date1
       char* date1 = argv[3];
       if (!is_valid_date_string(date1))
@@ -434,6 +436,105 @@ int validate_topk_countries(int argc, char** argv) {
     }
   }
   return VALID_COMMAND;
+}
+
+void execute_topk_countries(int argc, char** argv) {
+  printf("\nCommand <topk-Countries> executed.\n");
+  /* Extract info from arguemnts */
+  int k = atoi(argv[0]);
+  char* disease_id = argv[1];
+  /* Get for the given disease its AVL tree */
+  void* result = hash_table_find(disease_ht, disease_id);
+  if (result == NULL) {
+    report_warning("There is no Disease with Disease ID: <%s> recorded.", disease_id);
+  } else {
+    /* Cast result to avl pointer */
+    avl_ptr disease_avl = (avl_ptr) result;
+    /* Get the total number of countries reported in the system */
+    int no_countries = list_size(countries_names);
+    /*
+      Create a hash table to to map country -> total number of patients
+      for the given country affected by the disease
+    */
+    hash_table_ptr disease_stats_ht = hash_table_create(no_countries,
+                                                     parameters.bucket_size,
+                                                     hash_string, compare_string,
+                                                     print_string, print_int,
+                                                     NULL, destroy_int);
+    /* Initialize hash table - for each country set total number ot patients to 0 */
+    for (size_t i = 1U; i <= no_countries; ++i) {
+      /* Get every disease id */
+      list_node_ptr list_node = list_get(countries_names, i);
+      char* country = (*(char**) list_node->data_);
+      /* Check if current country already inserted to the disease stats hash table */
+      result = hash_table_find(disease_stats_ht, country);
+      if (result == NULL) {
+        int* init_patients = create_int(0);
+        /* Update hash table */
+        hash_table_insert(&disease_stats_ht, country, init_patients);
+      } else {
+        report_warning("Country: <%s> already specified.",
+                       disease_id);
+      }
+    }
+    /* Update Hash Table disease_stats while traversing disease AVL */
+    if (argc == 2) {
+      /* Get total numer of patients for the current disease */
+      __util_execute_topk(disease_avl, disease_stats_ht, get_country, NULL, NULL);
+    } else {
+      /* Get total number of patients for the current disease in a given date range */
+      __util_execute_topk(disease_avl, disease_stats_ht, get_country, argv[2], argv[3]);
+    }
+    /* Copy content to disease stats structure and Remove Hash table disease_stats_ht */
+    disease_stats_ptr disease_stats_table[no_countries];
+    for (size_t i = 0U; i < no_countries; ++i) {
+      /* Get every disease id */
+      list_node_ptr list_node = list_get(countries_names, i+1);
+      char* country = (*(char**) list_node->data_);
+      /* Check if current country has been inserted to the disease stats hash table */
+      result = hash_table_find(disease_stats_ht, country);
+      if (result == NULL) {
+        report_warning("Country: <%s> not found.", disease_id);
+      } else {
+        /* Copy disease id and store total number of patients */
+        disease_stats_table[i] = (disease_stats_ptr) malloc(sizeof(*disease_stats_table[i]));
+        disease_stats_table[i]->country = (char*) malloc((strlen(country) + 1) * sizeof(char));
+        strcpy(disease_stats_table[i]->country, country);
+        disease_stats_table[i]->no_patients = (*(int*) result);
+      }
+    }
+    /* Delete hash table */
+    hash_table_clear(disease_stats_ht);
+    /*
+      Build on the fly a max heap and insert there the elements
+      of the disease_stats_table
+    */
+    heap_ptr heap = heap_create(compare_disease_stats, NULL, NULL);
+    for (size_t i = 0; i < no_countries; ++i) {
+      heap_insert_max(&heap, disease_stats_table[i]);
+    }
+    /* Extract top k */
+    for (size_t i = 0; i < k; ++i) {
+      result = heap_extract_max(&heap);
+      if (result != NULL) {
+        disease_stats_ptr disease_stats_entry = (disease_stats_ptr) result;
+        if (argc == 2) {
+          printf("Country: <%s> - Total number of patients: <%d>\n",
+                 disease_stats_entry->country, disease_stats_entry->no_patients);
+        } else {
+          printf("Country: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
+                disease_stats_entry->country, argv[2], argv[3], disease_stats_entry->no_patients);
+        }
+      }
+    }
+    /* Delete heap */
+    heap_clear(heap);
+    /* Free memory allocated for the disease stats table */
+    for (size_t i = 0U; i < no_countries; ++i) {
+      __FREE(disease_stats_table[i]->country);
+      __FREE(disease_stats_table[i]);
+    }
+  }
 }
 
 int validate_insert_patient_record(int argc, char** argv) {
@@ -510,6 +611,8 @@ int execute_insert_patient_record(char** argv) {
     /* Search if patient record country exists */
     result = hash_table_find(country_ht, patient_record->country);
     if (result == NULL) {
+      /* Store country to global countries_names list */
+      list_push_front(&countries_names, &patient_record->country);
       /* If not found create a new AVL tree to store pointers to patient record */
       avl_ptr new_country_avl = avl_create(patient_record_compare,
                                            patient_record_print);
@@ -549,6 +652,7 @@ int validate_record_patient_exit(int argc, char** argv) {
 }
 
 void execute_record_patient_exit(char** argv) {
+  printf("\nCommand <recordPatientExit> executed.\n");
   /* Search if patient record country exists */
   void* result = hash_table_find(patient_record_ht, argv[0]);
   if (result == NULL) {
@@ -565,7 +669,6 @@ void execute_record_patient_exit(char** argv) {
       memset(&patient_record->exit_date, 0, sizeof(struct tm));
       strptime(argv[1], "%d-%m-%Y", &patient_record->exit_date);
       // Print success message
-      printf("\nCommand <recordPatientExit> executed.\n");
       printf("Patient record with Record ID: <%s> updated successfully.\n\n", argv[0]);
       patient_record_print(patient_record, stdout);
     } else {
@@ -666,5 +769,6 @@ void execute_exit() {
   hash_table_clear(disease_ht);
   hash_table_clear(country_ht);
   list_clear(diseases_names);
+  list_clear(countries_names);
   exit(EXIT_SUCCESS);
 }

@@ -177,3 +177,9 @@ int compare_country_stats(void* a, void* b) {
   country_stats_ptr cs_b = (country_stats_ptr) b;
   return cs_a->no_patients - cs_b->no_patients;
 }
+
+int compare_disease_stats(void* a, void* b) {
+  disease_stats_ptr ds_a = (disease_stats_ptr) a;
+  disease_stats_ptr ds_b = (disease_stats_ptr) b;
+  return ds_a->no_patients - ds_b->no_patients;
+}
