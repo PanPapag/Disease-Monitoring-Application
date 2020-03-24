@@ -181,7 +181,7 @@ heap_node_ptr __get_ith_heap_node(heap_node_ptr root, const size_t i) {
 
 void* heap_extract_max(heap_ptr* heap) {
   void* max_key = NULL;
-  if ((*heap)->root_ != NULL) {
+  if ((*heap)->root_ != NULL && (*heap)->size_ != 0) {
     /* In an max heap the max element is always in the root */
     max_key = (*heap)->root_->key_;
     /*

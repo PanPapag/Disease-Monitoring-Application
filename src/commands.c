@@ -45,18 +45,14 @@ int __count_patients_between(avl_node_ptr current_root, int* counter,
                              struct tm date1, struct tm date2, char* country) {
 
   avl_node_ptr temp = current_root;
-  patient_record_ptr patient_record = NULL;
   /* Prune left search below this node as all entries have entry date < date1 */
   if (temp != NULL) {
-    if (temp->left_ != NULL) {
-      patient_record = (patient_record_ptr) temp->left_->data_;
-      if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
-        __count_patients_between(temp->left_, counter, date1, date2, country);
-      }
-    }
-    patient_record = (patient_record_ptr) temp->data_;
+    __count_patients_between(temp->left_, counter, date1, date2, country);
+    patient_record_ptr patient_record = (patient_record_ptr) temp->data_;
     /* Check if patient_record exit date is not specified */
-    if (!is_unspecified_date_tm(patient_record->exit_date)) {
+    if (
+        compare_date_tm(date1, patient_record->entry_date) <= 0 &&
+        compare_date_tm(patient_record->exit_date, date2) <= 0) {
       /* Check upper bound */
       if (country != NULL) {
         if (!strcmp(country, patient_record->country)) {
@@ -69,12 +65,7 @@ int __count_patients_between(avl_node_ptr current_root, int* counter,
       }
     }
     /* Prune right search below this node as all entries have entry date > date2 */
-    if (temp->right_ != NULL) {
-      patient_record = (patient_record_ptr) temp->right_->data_;
-      if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
-        __count_patients_between(temp->right_, counter, date1, date2, country);
-      }
-    }
+    __count_patients_between(temp->right_, counter, date1, date2, country);
   }
 }
 
@@ -164,6 +155,9 @@ int validate_disease_frequency(int argc, char** argv) {
       char* date2 = argv[3];
       if (!is_valid_date_string(date2))
         return INVALID_COMMAND;
+      // Check if exit date is earlier than the entry date/
+      if (compare_date_strings(date1, date2) > 0)
+        return INVALID_COMMAND;
       // Check country to contain only letters
       char* country = argv[4];
       if (!is_alphabetical(country))
@@ -228,6 +222,9 @@ int validate_topk_diseases(int argc, char** argv) {
       char* date2 = argv[4];
       if (!is_valid_date_string(date2))
         return INVALID_COMMAND;
+      // Check if exit date is earlier than the entry date
+      if (compare_date_strings(date1, date2) > 0)
+        return INVALID_COMMAND;
     }
   }
   return VALID_COMMAND;
@@ -258,24 +255,25 @@ void __util_date_traverse_for_topk(avl_node_ptr current_root, hash_table_ptr ht,
   patient_record_ptr patient_record = NULL;
   /* Prune left search below this node as all entries have entry date < date1 */
   if (temp != NULL) {
-    if (temp->left_ != NULL) {
-      patient_record = (patient_record_ptr) temp->left_->data_;
-      if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
-        __util_date_traverse_for_topk(temp->left_, ht, get_value_to_hash, date1, date2);
-      }
-    }
     patient_record = (patient_record_ptr) temp->data_;
-    /* Update hash table value  */
-    void* result = hash_table_find(ht, get_value_to_hash(patient_record));
-    if (result != NULL) {
-      (*(int*)result)++;
+    if (compare_date_tm(date1, patient_record->entry_date) <= 0) {
+      __util_date_traverse_for_topk(temp->left_, ht, get_value_to_hash, date1, date2);
+    }
+
+    patient_record = (patient_record_ptr) temp->data_;
+    if (compare_date_tm(date1, patient_record->entry_date) <= 0 &&
+        compare_date_tm(patient_record->exit_date, date2) <= 0) {
+      /* Update hash table value  */
+      void* result = hash_table_find(ht, get_value_to_hash(patient_record));
+      if (result != NULL) {
+        patient_record_print(patient_record, stdout); // TODO
+        (*(int*)result)++;
+      }
     }
     /* Prune right search below this node as all entries have entry date > date2 */
-    if (temp->right_ != NULL) {
-      patient_record = (patient_record_ptr) temp->right_->data_;
-      if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
-        __util_date_traverse_for_topk(temp->right_, ht, get_value_to_hash, date1, date2);
-      }
+    patient_record = (patient_record_ptr) temp->data_;
+    if (compare_date_tm(patient_record->entry_date, date2) <= 0) {
+      __util_date_traverse_for_topk(temp->right_, ht, get_value_to_hash, date1, date2);
     }
   }
 }
@@ -301,7 +299,7 @@ void __util_execute_topk(avl_ptr avl, hash_table_ptr ht,
 }
 
 void execute_topk_diseases(int argc, char** argv) {
-  printf("\nCommand <topk-Diseases> executed.\n");
+  printf("\nCommand <topk-Diseases> executed.\n\n");
   /* Extract info from arguemnts */
   int k = atoi(argv[0]);
   char* country = argv[1];
@@ -433,13 +431,16 @@ int validate_topk_countries(int argc, char** argv) {
       char* date2 = argv[4];
       if (!is_valid_date_string(date2))
         return INVALID_COMMAND;
+      // Check if exit date is earlier than the entry date/
+      if (compare_date_strings(date1, date2) > 0)
+        return INVALID_COMMAND;
     }
   }
   return VALID_COMMAND;
 }
 
 void execute_topk_countries(int argc, char** argv) {
-  printf("\nCommand <topk-Countries> executed.\n");
+  printf("\nCommand <topk-Countries> executed.\n\n");
   /* Extract info from arguemnts */
   int k = atoi(argv[0]);
   char* disease_id = argv[1];
@@ -652,7 +653,7 @@ int validate_record_patient_exit(int argc, char** argv) {
 }
 
 void execute_record_patient_exit(char** argv) {
-  printf("\nCommand <recordPatientExit> executed.\n");
+  printf("\nCommand <recordPatientExit> executed.\n\n");
   /* Search if patient record country exists */
   void* result = hash_table_find(patient_record_ht, argv[0]);
   if (result == NULL) {
@@ -660,9 +661,18 @@ void execute_record_patient_exit(char** argv) {
   } else {
     // Cast result to patient record pointer
     patient_record_ptr patient_record = (patient_record_ptr) result;
-    /* Convert struct tm to buffer */
+    /* Convert exit_date struct tm to buffer */
     char exit_date_buffer[BUFFER_SIZE];
     strftime(exit_date_buffer, sizeof(exit_date_buffer), "%d-%m-%Y", &patient_record->exit_date);
+    /* Convert entry_date struct tm to buffer */
+    char entry_date_buffer[BUFFER_SIZE];
+    strftime(entry_date_buffer, sizeof(entry_date_buffer), "%d-%m-%Y", &patient_record->entry_date);
+    /* exit_date has to be greater than entry_date */
+    if (compare_date_strings(entry_date_buffer, argv[1]) > 0) {
+      report_warning("Entry Date [%s] is after the given Exit Date [%s].",
+                      entry_date_buffer, argv[1]);
+      return;
+    }
     /* Check if exit date is not specified */
     if (!strcmp(exit_date_buffer, EXIT_DATE_NOT_SPECIFIED)) {
       // Update exit day of patient record with the given record id
