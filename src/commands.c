@@ -107,18 +107,14 @@ void execute_global_disease_stats(int argc, char** argv) {
       avl_ptr disease_avl = (avl_ptr) result;
       if (argc == 0) {
         /* Print total number of patients - size of AVL tre */
-        printf("Disease: <%s> - Total number of patients: <%d>\n",
-               disease_id, avl_size(disease_avl));
+        printf("%s %d\n", disease_id, avl_size(disease_avl));
       } else {
         /* Print total number of patients in the given date range */
-        printf("Disease: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
-               disease_id, argv[0], argv[1],
+        printf("%s [%s] - [%s] %d\n", disease_id, argv[0], argv[1],
                __num_patients_between(disease_avl, argv[0], argv[1], NULL));
       }
     }
   }
-  /* Print a new line for better output format in console */
-  printf("\n");
 }
 
 int validate_disease_frequency(int argc, char** argv) {
@@ -178,18 +174,14 @@ void execute_disease_frequency(int argc, char** argv) {
     /* Determine if country argument was given or not */
     if (argc == 3) {
       /* Print total number of patients in the given date range */
-      printf("Disease: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
-             argv[0], argv[1], argv[2],
+      printf("%s [%s] - [%s] %d\n", argv[0], argv[1], argv[2],
              __num_patients_between(disease_avl, argv[1], argv[2], NULL));
     } else {
       /* Print total number of patients for given country in the given date range */
-      printf("Disease: <%s> - Country: <%s> - Total number of patients between "
-            "[%s] and [%s]: <%d>\n", argv[0], argv[3], argv[1], argv[2],
+      printf("%s %s [%s] - [%s] %d\n", argv[0], argv[3], argv[1], argv[2],
              __num_patients_between(disease_avl, argv[1], argv[2], argv[3]));
     }
   }
-  /* Print a new line for better output format in console */
-  printf("\n");
 }
 
 int validate_topk_diseases(int argc, char** argv) {
@@ -293,7 +285,6 @@ void __util_execute_topk(avl_ptr avl, hash_table_ptr ht,
 }
 
 void execute_topk_diseases(int argc, char** argv) {
-  printf("\nCommand <topk-Diseases> executed.\n\n");
   /* Extract info from arguemnts */
   int k = atoi(argv[0]);
   char* country = argv[1];
@@ -373,11 +364,10 @@ void execute_topk_diseases(int argc, char** argv) {
       if (result != NULL) {
         country_stats_ptr country_stats_entry = (country_stats_ptr) result;
         if (argc == 2) {
-          printf("Disease: <%s> - Total number of patients: <%d>\n",
-                 country_stats_entry->disease_id, country_stats_entry->no_patients);
+          printf("%s %d\n", country_stats_entry->disease_id, country_stats_entry->no_patients);
         } else {
-          printf("Disease: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
-                country_stats_entry->disease_id, argv[2], argv[3], country_stats_entry->no_patients);
+          printf("%s [%s] - [%s] %d\n", country_stats_entry->disease_id,
+            argv[2], argv[3], country_stats_entry->no_patients);
         }
       }
     }
@@ -434,7 +424,6 @@ int validate_topk_countries(int argc, char** argv) {
 }
 
 void execute_topk_countries(int argc, char** argv) {
-  printf("\nCommand <topk-Countries> executed.\n\n");
   /* Extract info from arguemnts */
   int k = atoi(argv[0]);
   char* disease_id = argv[1];
@@ -514,11 +503,10 @@ void execute_topk_countries(int argc, char** argv) {
       if (result != NULL) {
         disease_stats_ptr disease_stats_entry = (disease_stats_ptr) result;
         if (argc == 2) {
-          printf("Country: <%s> - Total number of patients: <%d>\n",
-                 disease_stats_entry->country, disease_stats_entry->no_patients);
+          printf("%s %d\n", disease_stats_entry->country, disease_stats_entry->no_patients);
         } else {
-          printf("Country: <%s> - Total number of patients between [%s] and [%s]: <%d>\n",
-                disease_stats_entry->country, argv[2], argv[3], disease_stats_entry->no_patients);
+          printf("%s [%s] - [%s] %d\n", disease_stats_entry->country,
+            argv[2], argv[3], disease_stats_entry->no_patients);
         }
       }
     }
@@ -619,6 +607,7 @@ int execute_insert_patient_record(char** argv) {
       avl_ptr country_avl = (avl_ptr) result;
       avl_insert(&country_avl, patient_record);
     }
+    printf("Record added\n");
   } else {
     report_warning("Patient record with Record ID: <%s> already exists. ",
                    patient_record->record_id);
@@ -647,7 +636,6 @@ int validate_record_patient_exit(int argc, char** argv) {
 }
 
 void execute_record_patient_exit(char** argv) {
-  printf("\nCommand <recordPatientExit> executed.\n\n");
   /* Search if patient record country exists */
   void* result = hash_table_find(patient_record_ht, argv[0]);
   if (result == NULL) {
@@ -673,7 +661,7 @@ void execute_record_patient_exit(char** argv) {
       memset(&patient_record->exit_date, 0, sizeof(struct tm));
       strptime(argv[1], "%d-%m-%Y", &patient_record->exit_date);
       // Print success message
-      printf("Patient record with Record ID: <%s> updated successfully.\n\n", argv[0]);
+      printf("Record updated\n");
       patient_record_print(patient_record, stdout);
     } else {
       report_warning("Patient record Exit Date with Record ID: "
@@ -723,7 +711,6 @@ int __num_current_patients_util(avl_ptr disease_avl) {
 }
 
 void execute_num_current_patients(int argc, char** argv) {
-  printf("\nCommand <numCurrentPatients> executed.\n\n");
   if (argc == 0) {
     /* Print for every disease the number of patients that are still in hospital */
     for (size_t i = 1U; i <= list_size(diseases_names); ++i) {
@@ -740,8 +727,7 @@ void execute_num_current_patients(int argc, char** argv) {
         avl_ptr disease_avl = (avl_ptr) result;
         /* Execute main algorithm to print current patients */
         int no_current_patients = __num_current_patients_util(disease_avl);
-        printf("Disease: <%s> - Number of current patients: <%d>\n",
-               disease_id, no_current_patients);
+        printf("%s %d\n", disease_id, no_current_patients);
       }
     }
   } else {
@@ -754,8 +740,7 @@ void execute_num_current_patients(int argc, char** argv) {
       avl_ptr disease_avl = (avl_ptr) result;
       /* Execute main algorithm to find number of current patients */
       int no_current_patients = __num_current_patients_util(disease_avl);
-      printf("Disease: <%s> - Number of current patients: <%d>\n",
-             argv[0], no_current_patients);
+      printf("%s %d\n", argv[0], no_current_patients);
     }
   }
   /* Print a new line for better output format in console */
