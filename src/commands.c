@@ -92,7 +92,6 @@ int __num_patients_between(avl_ptr disease_avl, char* date1, char* date2, char* 
 }
 
 void execute_global_disease_stats(int argc, char** argv) {
-  printf("\nCommand <globalDiseaseStats> executed.\n\n");
   /* Print for every disease the total number of patients */
   for (size_t i = 1U; i <= list_size(diseases_names); ++i) {
     /* Get every disease id */
@@ -768,7 +767,7 @@ int validate_exit(int argc, char** argv) {
 }
 
 void execute_exit() {
-  printf("\nExiting..\n\n");
+  printf("exiting\n");
   /* Free all memory allocated by the program */
   hash_table_clear(patient_record_ht);
   hash_table_clear(disease_ht);

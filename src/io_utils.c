@@ -149,7 +149,7 @@ void handle_command(char command[]) {
   command_tokens = p.we_wordv;
   command_no_tokens = p.we_wordc;
   /* Call correspoding command function */
-  if (!strcmp(command_tokens[0], "globalDiseaseStats")) {
+  if (!strcmp(command_tokens[0], "/globalDiseaseStats")) {
     if (validate_global_disease_stats(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
       command_argc = command_no_tokens - 1;
@@ -159,7 +159,7 @@ void handle_command(char command[]) {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: globalDiseaseStats [date1 date2]\n");
     }
-  } else if (!strcmp(command_tokens[0], "diseaseFrequency")) {
+  } else if (!strcmp(command_tokens[0], "/diseaseFrequency")) {
     if (validate_disease_frequency(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
       command_argc = command_no_tokens - 1;
@@ -169,7 +169,7 @@ void handle_command(char command[]) {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: diseaseFrequency virusName date1 date2 [country]\n");
     }
-  } else if (!strcmp(command_tokens[0], "topk-Diseases")) {
+  } else if (!strcmp(command_tokens[0], "/topk-Diseases")) {
     if (validate_topk_diseases(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
       command_argc = command_no_tokens - 1;
@@ -179,7 +179,7 @@ void handle_command(char command[]) {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: topk-Diseases k country [date1 date2]\n");
     }
-  } else if (!strcmp(command_tokens[0], "topk-Countries")) {
+  } else if (!strcmp(command_tokens[0], "/topk-Countries")) {
     if (validate_topk_countries(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
       command_argc = command_no_tokens - 1;
@@ -189,7 +189,7 @@ void handle_command(char command[]) {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: topk-Countries k disease [date1 date2]\n");
     }
-  } else if (!strcmp(command_tokens[0], "insertPatientRecord")) {
+  } else if (!strcmp(command_tokens[0], "/insertPatientRecord")) {
     if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
       int command_code = execute_insert_patient_record(command_argv);
@@ -206,7 +206,7 @@ void handle_command(char command[]) {
       fprintf(stderr, "Usage: insertPatientRecord recordID patientFirstName "
                       "patientLastName diseaseID country entryDate [exitDate]\n");
     }
-  } else if (!strcmp(command_tokens[0], "recordPatientExit")) {
+  } else if (!strcmp(command_tokens[0], "/recordPatientExit")) {
     if (validate_record_patient_exit(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
       execute_record_patient_exit(command_argv);
@@ -215,7 +215,7 @@ void handle_command(char command[]) {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: recordPatientExit recordID exitDate\n");
     }
-  } else if (!strcmp(command_tokens[0], "numCurrentPatients")) {
+  } else if (!strcmp(command_tokens[0], "/numCurrentPatients")) {
     if (validate_num_current_patients(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
       command_argc = command_no_tokens - 1;
@@ -225,7 +225,7 @@ void handle_command(char command[]) {
       report_warning("Invalid <%s> command.", command_tokens[0]);
       fprintf(stderr, "Usage: numCurrentPatients [disease]\n");
     }
-  } else if (!strcmp(command_tokens[0], "exit")) {
+  } else if (!strcmp(command_tokens[0], "/exit")) {
     if (validate_exit(command_no_tokens, command_tokens)) {
       /* Free wordexp object */
       wordfree(&p);
