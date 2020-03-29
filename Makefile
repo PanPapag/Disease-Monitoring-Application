@@ -1,4 +1,4 @@
-TARGET_EXEC ?= test
+TARGET_EXEC ?= diseaseMonitor
 
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src
