@@ -110,7 +110,7 @@ void execute_global_disease_stats(int argc, char** argv) {
         printf("%s %d\n", disease_id, avl_size(disease_avl));
       } else {
         /* Print total number of patients in the given date range */
-        printf("%s [%s] - [%s] %d\n", disease_id, argv[0], argv[1],
+        printf("%s %d\n", disease_id,
                __num_patients_between(disease_avl, argv[0], argv[1], NULL));
       }
     }
@@ -164,7 +164,6 @@ int validate_disease_frequency(int argc, char** argv) {
 }
 
 void execute_disease_frequency(int argc, char** argv) {
-  printf("\nCommand <diseaseFrequency> executed.\n\n");
   void* result = hash_table_find(disease_ht, argv[0]);
   if (result == NULL) {
     report_warning("There is no disease recorded with Disease ID: <%s>", argv[0]);
@@ -174,11 +173,11 @@ void execute_disease_frequency(int argc, char** argv) {
     /* Determine if country argument was given or not */
     if (argc == 3) {
       /* Print total number of patients in the given date range */
-      printf("%s [%s] - [%s] %d\n", argv[0], argv[1], argv[2],
+      printf("%s %d\n", argv[0],
              __num_patients_between(disease_avl, argv[1], argv[2], NULL));
     } else {
       /* Print total number of patients for given country in the given date range */
-      printf("%s %s [%s] - [%s] %d\n", argv[0], argv[3], argv[1], argv[2],
+      printf("%s %d\n", argv[0],
              __num_patients_between(disease_avl, argv[1], argv[2], argv[3]));
     }
   }
@@ -366,8 +365,7 @@ void execute_topk_diseases(int argc, char** argv) {
         if (argc == 2) {
           printf("%s %d\n", country_stats_entry->disease_id, country_stats_entry->no_patients);
         } else {
-          printf("%s [%s] - [%s] %d\n", country_stats_entry->disease_id,
-            argv[2], argv[3], country_stats_entry->no_patients);
+          printf("%s %d\n", country_stats_entry->disease_id, country_stats_entry->no_patients);
         }
       }
     }
@@ -505,8 +503,7 @@ void execute_topk_countries(int argc, char** argv) {
         if (argc == 2) {
           printf("%s %d\n", disease_stats_entry->country, disease_stats_entry->no_patients);
         } else {
-          printf("%s [%s] - [%s] %d\n", disease_stats_entry->country,
-            argv[2], argv[3], disease_stats_entry->no_patients);
+          printf("%s %d\n", disease_stats_entry->country, disease_stats_entry->no_patients);
         }
       }
     }

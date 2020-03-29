@@ -157,7 +157,7 @@ void handle_command(char command[]) {
       __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: globalDiseaseStats [date1 date2]\n");
+      fprintf(stderr, "Usage: /globalDiseaseStats [date1 date2]\n");
     }
   } else if (!strcmp(command_tokens[0], "/diseaseFrequency")) {
     if (validate_disease_frequency(command_no_tokens, command_tokens)) {
@@ -167,7 +167,7 @@ void handle_command(char command[]) {
       __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: diseaseFrequency virusName date1 date2 [country]\n");
+      fprintf(stderr, "Usage: /diseaseFrequency virusName date1 date2 [country]\n");
     }
   } else if (!strcmp(command_tokens[0], "/topk-Diseases")) {
     if (validate_topk_diseases(command_no_tokens, command_tokens)) {
@@ -177,7 +177,7 @@ void handle_command(char command[]) {
       __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: topk-Diseases k country [date1 date2]\n");
+      fprintf(stderr, "Usage: /topk-Diseases k country [date1 date2]\n");
     }
   } else if (!strcmp(command_tokens[0], "/topk-Countries")) {
     if (validate_topk_countries(command_no_tokens, command_tokens)) {
@@ -187,7 +187,7 @@ void handle_command(char command[]) {
       __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: topk-Countries k disease [date1 date2]\n");
+      fprintf(stderr, "Usage: /topk-Countries k disease [date1 date2]\n");
     }
   } else if (!strcmp(command_tokens[0], "/insertPatientRecord")) {
     if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
@@ -203,7 +203,7 @@ void handle_command(char command[]) {
       }
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: insertPatientRecord recordID patientFirstName "
+      fprintf(stderr, "Usage: /insertPatientRecord recordID patientFirstName "
                       "patientLastName diseaseID country entryDate [exitDate]\n");
     }
   } else if (!strcmp(command_tokens[0], "/recordPatientExit")) {
@@ -213,7 +213,7 @@ void handle_command(char command[]) {
       __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: recordPatientExit recordID exitDate\n");
+      fprintf(stderr, "Usage: /recordPatientExit recordID exitDate\n");
     }
   } else if (!strcmp(command_tokens[0], "/numCurrentPatients")) {
     if (validate_num_current_patients(command_no_tokens, command_tokens)) {
@@ -223,7 +223,7 @@ void handle_command(char command[]) {
       __FREE(command_argv);
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: numCurrentPatients [disease]\n");
+      fprintf(stderr, "Usage: /numCurrentPatients [disease]\n");
     }
   } else if (!strcmp(command_tokens[0], "/exit")) {
     if (validate_exit(command_no_tokens, command_tokens)) {
@@ -233,7 +233,7 @@ void handle_command(char command[]) {
       execute_exit();
     } else {
       report_warning("Invalid <%s> command.", command_tokens[0]);
-      fprintf(stderr, "Usage: exit\n");
+      fprintf(stderr, "Usage: /exit\n");
     }
   } else {
     report_warning("Unknown command: <%s>.", command);

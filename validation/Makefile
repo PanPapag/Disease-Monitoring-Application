@@ -1,7 +1,7 @@
 TARGET_EXEC ?= diseaseMonitor
 
 OBJECTS_DIR ?= ./objects
-SRC_DIRS ?= ./src
+SRC_DIRS ?= ../src
 
 SRCS := $(shell find $(SRC_DIRS) -name *.c)
 OBJS := $(SRCS:%=$(OBJECTS_DIR)/%.o)
@@ -25,6 +25,7 @@ $(OBJECTS_DIR)/%.c.o: %.c
 
 clean:
 	$(RM) -r $(OBJECTS_DIR)
+	$(RM) -r ./src
 	$(RM) $(TARGET_EXEC)
 
 
