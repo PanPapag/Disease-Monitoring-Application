@@ -1,0 +1,31 @@
+/globalDiseaseStats
+disease1 number
+disease2 number
+diseaseN number
+
+/diseaseFrequency
+disease number
+
+/topk-Diseases
+disease1 number
+disease2 number
+diseasek number
+
+/topk-Countries
+country1 number
+country2 number
+countryk number
+
+/insertPatientRecord
+Record added
+
+/recordPatientExit
+Record updated
+
+/numCurrentPatients
+disease1 number
+disease2 number
+diseaseN number
+
+/exit
+exiting
