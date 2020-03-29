@@ -31,7 +31,7 @@
   void execute_topk_countries(int, char**);
 
   int validate_insert_patient_record(int, char**);
-  int execute_insert_patient_record(char**);
+  int execute_insert_patient_record(char**, int);
 
   int validate_record_patient_exit(int, char**);
   void execute_record_patient_exit(char**);

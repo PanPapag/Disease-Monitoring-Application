@@ -107,7 +107,7 @@ void read_patient_records_file_and_update_structures() {
     int code = validate_patient_record_tokens(patient_record_tokens);
     if (code == VALID_PATIENT_RECORD) {
       /* Check if a patient record with already existing Record ID was given */
-      if (execute_insert_patient_record(patient_record_tokens) == EXIT) {
+      if (execute_insert_patient_record(patient_record_tokens, 1) == EXIT) {
         /* Free wordexp object */
         wordfree(&p);
         /* Close file pointer */
@@ -192,7 +192,7 @@ void handle_command(char command[]) {
   } else if (!strcmp(command_tokens[0], "/insertPatientRecord")) {
     if (validate_insert_patient_record(command_no_tokens, command_tokens)) {
       command_argv = prune_command_name(command_tokens, command_no_tokens);
-      int command_code = execute_insert_patient_record(command_argv);
+      int command_code = execute_insert_patient_record(command_argv, 0);
       __FREE(command_argv);
       /* Check if a patient record with already existing Record ID was given */
       if (command_code == EXIT) {

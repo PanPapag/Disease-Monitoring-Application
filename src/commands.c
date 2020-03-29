@@ -565,7 +565,7 @@ int validate_insert_patient_record(int argc, char** argv) {
   return VALID_COMMAND;
 }
 
-int execute_insert_patient_record(char** argv) {
+int execute_insert_patient_record(char** argv, int read_flag) {
   patient_record_ptr patient_record = patient_record_create(argv);
   void* result = hash_table_find(patient_record_ht, patient_record->record_id);
   /* If record Id not found */
@@ -604,7 +604,9 @@ int execute_insert_patient_record(char** argv) {
       avl_ptr country_avl = (avl_ptr) result;
       avl_insert(&country_avl, patient_record);
     }
-    printf("Record added\n");
+    if (!read_flag) {
+      printf("Record added\n"); 
+    }
   } else {
     report_warning("Patient record with Record ID: <%s> already exists. ",
                    patient_record->record_id);
