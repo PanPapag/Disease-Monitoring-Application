@@ -41,12 +41,21 @@ the patient admitted to the hospital.
 
 ## Application Functionality
 
-In the beginning, the application opens the ```patientRecordFile```, reads the lines one by one, initializes and stores in memory the data structures that will be used when executing the queries. Also, it checks the validity of the data in the file. For example, it can handle errors such as two records in the ```patientRecordFile``` with the same ```recordID```. Moreover, if it finds a record where the ```entryDate``` is later than ```exitDate```, then the application will display a message that the record is rejected.
+In the beginning, the application opens the ```patientRecordFile```, reads the lines one by one, initializes and stores in memory the data structures that will be used when executing the queries. Also, it checks the validity of the data in the file. For example, it can handle errors such as two records in the ```patientRecordFile``` with the same ```recordID```. Moreover, if it finds a record where the ```entryDate``` is later than ```exitDate```, then the application will display a message that the record is rejected. In particular, the applications handles the below errors:
 
 When the application finishes processing the ```patientRecordsFile``` file, it will wait user input from the keyboard. The user will be able to give the following commands (arguments in [] are optional):
 
--
-- 
+- ```/globalDiseaseStats [date1 date2]```:
+
+    The application will print for each virus, the number of cases recorded in the system. If
+  ```date1``` ```date2``` are provided, then the application will print for each virus the number of cases they have been
+  recorded in the system within the time period ```[date1 ... date2]```.
+  If there is a definition for ```[date1]```, then there should be a definition for ```[date2]``` as well, otherwise 
+  an error message is printed to the user.
+
+- ```/diseaseFrequency virusName [country] date1 date2```:
+
+  If 
 
 
 
