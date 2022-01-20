@@ -29,6 +29,27 @@ means that we have three records describing three cases in three different count
 (China, Italy, USA). In the second registration, there is no discharge date (the patient remains at
 hospital). Specifically, a record is an ASCII line of text that consists of the following data:
 
-- 
+1. ```recordID```: a string (it can have only one digit) that in a unique way
+determines each such record.
+2. ```patientFirstName```: a string consisting of letters without spaces.
+3. ```patientLastName```: a string consisting of letters without spaces.
+4. ```diseaseID```: a string consisting of letters, numbers, and possibly one hyphen “-” but without spaces.
+5. ```country```: a string consisting of letters without spaces.
+6. ```entryDate```: date of admission to the hospital. It must have the form DD-MM-YYYY where DD expresses the day, MM the month, and YYYY the year that 
+the patient admitted to the hospital.
+7. ```exitDate```: date the patient was discharged from the hospital. It must have the form DD-MM-YYYY where DD expresses the day, MM the month, and YYYY the year that the patient discharged from the hospital or hyphen (-) which means that the patient has not yet been discharged.
+
+## Application Functionality
+
+In the beginning, the application opens the ```patientRecordFile```, reads the lines one by one, initializes and stores in memory the data structures that will be used when executing the queries. Also, it checks the validity of the data in the file. For example, it can handle errors such as two records in the ```patientRecordFile``` with the same ```recordID```. Moreover, if it finds a record where the ```entryDate``` is later than ```exitDate```, then the application will display a message that the record is rejected.
+
+When the application finishes processing the ```patientRecordsFile``` file, it will wait user input from the keyboard. The user will be able to give the following commands (arguments in [] are optional):
+
 -
 - 
+
+
+
+
+
+
