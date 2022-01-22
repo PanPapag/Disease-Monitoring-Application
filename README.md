@@ -83,7 +83,7 @@ the disease ```diseaseID```. If no argument is given, the application will print
 
   Application exits. All memory is freed. 
   
-## System Design
+## System Design and Data Structures
 
 ![](system_design.png)
   
@@ -91,5 +91,13 @@ Our goal it to minimize the data duplication and make sure that for each sub-pro
 
 The following data structures have been implemented: 
 
-1.
-2. 
+1. Two hash tables (```diseaseHashTable``` and ```countryHashTable```) which offer fast access to patient records data indexes by case and country by case. The hash tables use buckets to serve ```diseases```/```countries``` that present colission (i.e., the result of the hash function leads to the same element of the hash table). If more than one bucket is needed to store the data, they are created dynamically and ordered into a list.
+2. In order to know which ```patientRecords``` records exist at a given time and to have easy access to one through its ```recordID```, a hash table is maintained which maps ```RecordID``` to the corresponding ```patientRecord```. In essence, the value of this hash table is a pointer to the corresponding ```patientRecord``` record.
+3. For every ```diseaseID``` that is hashed into an element of ```diseaseHashTable```, there is a set of ```patientRecords``` for patients who have been hospitalized due to the ```diseaseID``` disease. This set is placed in a balanced binary search tree. Each node of the tree provides information for a ```patientRecord``` record. The tree is sorted by the date of admission of the patient to the hospital. The balanced binary tree was implemented as an AVL tree. The main reason this structure was chosen over the Red-Black Tree is that AVLs offer faster look-ups. Similarly, when we have an application that there are many insertions, Red-Black Trees have a better response time. In the present project, the AVL trees with key the ```entryDate```  of a ```patientRecord``` store a pointer to each node in the corresponding record.
+4. For the ```topk-Diseases``` command, the application builds binary heap on-the-fly (i.e., max heap) where each node holds all the cases of a ```diseaseID``` and 
+facilitates the finding of the diseases that are the top k cases in the country. Similarly, for the ```topk-Countries``` command, the application builds binary heap on-the-fly (i.e., max heap) where each node holds the set of cases of a ```Country``` for a specific ```diseaseID```. The max heap was implemented as a binary tree. 
+5. To reduce search time in ```topk-Diseases``` and ```topk-Countries``` commands, two global lists are maintained with the unique ```DiseaseIDs``` and ```Countries```.
+6. All data structures were implemented to be generic.
+
+## Memory Allocation/Deallocation
+
