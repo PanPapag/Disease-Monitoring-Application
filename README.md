@@ -83,5 +83,13 @@ the disease ```diseaseID```. If no argument is given, the application will print
 
   Application exits. All memory is freed. 
   
-  
+## System Design
 
+![](system_design.png)
+  
+Our goal it to minimize the data duplication and make sure that for each sub-problem we need to solve, the most efficient algorithm or data structure is used. 
+
+The following data structures have been implemented: 
+
+1.
+2. 
