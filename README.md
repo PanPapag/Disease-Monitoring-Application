@@ -113,5 +113,3 @@ The executable will be under the folder ```build```.
 ## License
 
 This project is licensed under the MIT License.
-
-MIT © [PanPapag]()
