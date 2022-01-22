@@ -53,12 +53,35 @@ When the application finishes processing the ```patientRecordsFile``` file, it w
   If there is a definition for ```[date1]```, then there should be a definition for ```[date2]``` as well, otherwise 
   an error message is printed to the user.
 
-- ```/diseaseFrequency virusName [country] date1 date2```:
+- ```/diseaseFrequency diseaseID [country] date1 date2```:
 
-  If 
+  If no ```country``` argument is given, then the application will print, for the disease ```diseaseID```, the number of cases they have been recored in the system     within the time period ```[date1 ... date2]```.   If ```country``` argument is given, then the application will print, for the disease ```diseaseID``` and the country ```country```, the number of cases they have been recored in the system within the time period ```[date1 ... date2]```.
 
+- ```/topk-Diseases k country [date1 date2]```:
+  
+  The application will print, for the country ```country```, the diseases that are the top k of the cases
+  within the period ```[date1 ... date2]``` if given. If there is a definition for ```[date1]```, then there should be a definition for ```[date2]``` as well,    otherwise an error message is printed to the user.
 
+- ```/topk-Countries k diseaseID [date1 date2]```:
+  
+  The application will print, for the disease ```diseaseID```, the countries that have shown the top k of the cases of that disease.
+  
+- ```/insertPatientRecord recordID patientFirstName patientLastName diseaseID country entryDate [exitDate]```:
 
+  The application will introduce a new registration with its data in the system. 
+  
+- ```/recordPatientExit recordID exitDate```:
 
+  The application will add ```exitDate``` to the record with ID ```recordID```.
+  
+- ```/numCurrentPatients [diseaseID]```:
 
+  If the argument ```diseaseID``` is given, the application will print the number of patients still being treated with
+the disease ```diseaseID```. If no argument is given, the application will print, for each virus, the records of the patients still being treated.
+
+- ```/exit```:
+
+  Application exits. All memory is freed. 
+  
+  
 
