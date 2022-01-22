@@ -101,3 +101,10 @@ facilitates the finding of the diseases that are the top k cases in the country.
 
 ## Memory Allocation/Deallocation
 
+- Any memory is allocated dynamically and freed when the program exits or as soon as it is no longer needed.
+- When reading the input file using ```fgets()``` the parsed line is stored in a ```buffer``` of size ```1025```. Such buffers are also used in various other functions such as converting ```date string``` to ```date struct``` struct tm (or vice versa).
+- The delete functions of the data structures are configured so that only the hash table of the records deletes all the memory reserved for the ```patientRecord``` records. The other data structures simply delete the memory reserved for themselves and not the value they store, thus avoiding issues such as double free and memory corruption.
+
+## Compilation 
+Type ```make```
+
